@@ -18,9 +18,11 @@ import {
 } from "lucide-react";
 import NavItem from "../ui/NavItem";
 import { useAuthContext } from "@/src/features/auth/context/AuthContext";
+import { usePathname } from "next/navigation";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, logout, isHydrated } = useAuthContext();
+  const pathname = usePathname();
 
   return (
     <div className="min-h-screen w-screen bg-[#0f172a] text-slate-200 flex overflow-hidden overflow-x-hidden">
@@ -37,14 +39,50 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
 
         <nav className="flex-1 px-4 space-y-2">
-          <NavItem icon={<LayoutDashboard size={20} />} label="Dashboard" active />
-          <NavItem icon={<Package size={20} />} label="Asset Catalog" />
-          <NavItem icon={<MapPin size={20} />} label="Location Management" />
-          <NavItem icon={<Smartphone size={20} />} label="Device Management" />
-          <NavItem icon={<ShieldQuestionMark size={20} />} label="Audit & Reporting" />
-          <NavItem icon={<History size={20} />} label="Scan History" />
-          <NavItem icon={<Settings size={20} />} label="Settings" />
+          <NavItem 
+            icon={<LayoutDashboard size={20} />} 
+            label="Dashboard" 
+            href="/dashboard" 
+            active={pathname === "/dashboard"} 
+          />
+          <NavItem 
+            icon={<Package size={20} />} 
+            label="Asset Catalog" 
+            href="/asset_management" 
+            active={pathname === "/asset_management"} 
+          />
+          <NavItem 
+            icon={<MapPin size={20} />} 
+            label="Location Management" 
+            href="/location_management" 
+            active={pathname === "/location_management"} 
+          />
+          <NavItem 
+            icon={<Smartphone size={20} />} 
+            label="Device Management" 
+            href="/device_management" 
+            active={pathname === "/device_management"} 
+          />
+          <NavItem 
+            icon={<ShieldQuestionMark size={20} />} 
+            label="Audit & Reporting" 
+            href="/audit_&_reporting" 
+            active={pathname === "/audit_&_reporting"} 
+          />
+          <NavItem 
+            icon={<History size={20} />} 
+            label="Scan History" 
+            href="/scan_history" 
+            active={pathname === "/scan_history"} 
+          />
+          <NavItem 
+            icon={<Settings size={20} />} 
+            label="Settings" 
+            href="/settings" 
+            active={pathname === "/settings"} 
+          />
         </nav>
+
 
         <div className="p-4 border-t border-white/10">
           <button
