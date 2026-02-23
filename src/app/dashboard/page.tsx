@@ -13,7 +13,6 @@ import {
   Search,
   Plus,
   Activity,
-  Box,
   AlertCircle,
   Smartphone,
   ShieldQuestionMark,
@@ -22,8 +21,11 @@ import {
 import { useDashboard } from "@/src/features/dashboard/hooks/useDashboard";
 import StatCard from "@/src/features/dashboard/components/StatCard";
 
+import { useAuthContext } from "@/src/features/auth/context/AuthContext";
+
 export default function DashboardPage() {
   const { data, loading, error } = useDashboard();
+  const { user, logout, isHydrated } = useAuthContext();
 
   return (
     <div className="min-h-screen w-screen bg-[#0f172a] text-slate-200 flex overflow-hidden overflow-x-hidden">
@@ -50,7 +52,10 @@ export default function DashboardPage() {
         </nav>
 
         <div className="p-4 border-t border-white/10">
-          <button className="flex items-center gap-3 w-full px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all">
+          <button
+            onClick={logout}
+            className="flex items-center gap-3 w-full px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl transition-all"
+          >
             <LogOut size={20} />
             <span className="font-medium">Sign Out</span>
           </button>
@@ -76,8 +81,17 @@ export default function DashboardPage() {
             </button>
             <div className="flex items-center gap-3 pl-4 border-l border-white/10">
               <div className="text-right">
-                <p className="text-sm font-medium text-white">Admin User</p>
-                <p className="text-xs text-slate-400">Warehouse Manager</p>
+                {!isHydrated || !user ? (
+                  <div className="space-y-1">
+                    <div className="w-24 h-4 bg-white/10 rounded-md animate-pulse" />
+                    <div className="w-16 h-3 bg-white/5 rounded-md animate-pulse ml-auto" />
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-sm font-medium text-white">{user.username}</p>
+                    <p className="text-xs text-slate-400">{user.role}</p>
+                  </>
+                )}
               </div>
               <div className="w-10 h-10 rounded-full bg-linear-to-r from-blue-600 to-indigo-600 flex items-center justify-center text-white border border-white/20">
                 <User size={20} />

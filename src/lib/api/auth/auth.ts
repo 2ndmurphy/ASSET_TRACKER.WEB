@@ -10,43 +10,39 @@ export interface RegisterRequest {
   password: string;
 }
 
-export interface AuthResponse {
-  accessToken: string;
-  expiresIn: string;
-  user: {
-    userId: string;
-    username: string;
-    role: string;
-  };
+export interface User {
+  userId: string;
+  username: string;
+  role: string;
 }
 
-export interface BaseResponse<T> {
+export interface AuthResponse {
   success: boolean;
   message: string;
-  data: T;
-  errorType: number;
 }
 
-export function registerApi(payload: RegisterRequest): Promise<BaseResponse<AuthResponse>> {
-  return apiClient.post("/web/register", payload);
+export interface MeResponse {
+  success: boolean;
+  message: string;
+  user: User;
 }
 
-export function loginApi(payload: LoginRequest): Promise<BaseResponse<AuthResponse>> {
-  return apiClient.post("/web/login", payload);
+export function registerApi(payload: RegisterRequest): Promise<AuthResponse> {
+  return apiClient.post("/auth/web/register", payload);
+}
+
+export function loginApi(payload: LoginRequest): Promise<AuthResponse> {
+  return apiClient.post("/auth/web/login", payload);
 }
 
 export function logoutApi() {
-  return apiClient.post("/web/logout");
+  return apiClient.post("/auth/web/logout");
+}
+
+export function getMeApi(): Promise<MeResponse> {
+  return apiClient.get("/auth/web/me");
 }
 
 // export function getProfileApi() {
 //   return apiClient.get<AuthResponse["user"]>("/auth/me");
-// }
-
-// export function refreshApi() {
-//   return apiClient.post<AuthResponse>("/auth/refresh");
-// }
-
-// export function revokeApi() {
-//   return apiClient.post("/auth/revoke");
 // }

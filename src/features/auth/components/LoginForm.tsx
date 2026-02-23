@@ -5,18 +5,22 @@ import { useAuth } from "../hooks/useAuth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+import { useAuthContext } from "@/src/features/auth/context/AuthContext";
+
 export default function LoginForm() {
   const [formData, setFormData] = useState({
     username: "",
     password: "",
   });
   const { login, loading, error } = useAuth();
+  const { refreshUser } = useAuthContext();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       await login(formData);
+      await refreshUser();
       router.push("/dashboard");
     } catch (err) {
       // Error di handle oleh useAuth
@@ -47,7 +51,7 @@ export default function LoginForm() {
         <label className="text-sm font-medium text-slate-300 ml-1">Password</label>
         <input
           type="password"
-          value={ formData.password}
+          value={formData.password}
           onChange={(e) => setFormData({ ...formData, password: e.target.value })}
           placeholder="Enter your password"
           className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"

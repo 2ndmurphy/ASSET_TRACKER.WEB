@@ -5,18 +5,22 @@ import { useAuth } from "../hooks/useAuth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+import { useAuthContext } from "@/src/features/auth/context/AuthContext";
+
 export default function RegisterForm() {
   const [formData, setFormData] = useState({
     username: "",
     password: "",
   });
   const { register, loading, error } = useAuth();
+  const { refreshUser } = useAuthContext();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       await register(formData);
+      await refreshUser();
       router.push("/dashboard");
     } catch (err) {
       // Error handled by useAuth
