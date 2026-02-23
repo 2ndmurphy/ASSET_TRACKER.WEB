@@ -1,9 +1,8 @@
-// app/dashboard/page.tsx   (Next.js app-router) OR pages/dashboard/index.tsx for pages-router
 "use client";
 
 import React from "react";
 import StatCard from "@/src/features/dashboard/components/StatCard";
-import { Package, Van, AlertCircle, MapPin, Activity, History, Plus } from "lucide-react";
+import { Package, Van, AlertCircle } from "lucide-react";
 import { useDashboard } from "@/src/features/dashboard/hooks/useDashboard";
 import { StatCardSkeleton, AssetDistributionSkeleton, RecentActivitySkeleton } from "@/src/components/ui/Skeletons";
 import AssetDistribution from "@/src/features/dashboard/components/AssetDistribution";

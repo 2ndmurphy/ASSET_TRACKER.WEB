@@ -29,5 +29,4 @@ export interface DashboardOverviewResponse {
   success: boolean;
   message: string;
   data: DashboardOverviewData;
-  errorType: number;
 }

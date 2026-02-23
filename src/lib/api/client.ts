@@ -89,35 +89,53 @@ export function createApiClient(opts?: {
   instance.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
       try {
+        console.group(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`);
+        console.log("Full URL:", (config.baseURL || "") + config.url);
+        console.log("Headers:", config.headers);
+        console.log("Data:", config.data);
+        console.groupEnd();
+
         if (attachTokenFromCookie) {
           const token = getTokenCookie();
           if (token) {
-            // InternalAxiosRequestConfig guarantees headers object exists
             if (!config.headers.has("Authorization")) {
               config.headers.set("Authorization", `Bearer ${token}`);
             }
           }
         }
-        // Ensure withCredentials honored per-request as well
         if (typeof config.withCredentials === "undefined") {
           config.withCredentials = withCredentials;
         }
       } catch (e) {
+        console.error("Request Interceptor Error:", e);
       }
       return config;
     },
-    (error) => Promise.reject(normalizeAxiosError(error))
+    (error) => {
+      console.error("❌ Request Interceptor Error:", error);
+      return Promise.reject(normalizeAxiosError(error));
+    }
   );
 
   instance.interceptors.response.use(
     (response) => {
+      console.group(`✅ API Response: ${response.config.method?.toUpperCase()} ${response.config.url}`);
+      console.log("Status:", response.status);
+      console.log("Body:", response.data);
+      console.groupEnd();
       return response.data;
     },
     (error) => {
       const norm = normalizeAxiosError(error);
+      console.group(`❌ API Error: ${error.config?.method?.toUpperCase()} ${error.config?.url}`);
+      console.log("Status:", norm.status);
+      console.log("Message:", norm.message);
+      console.log("Data:", norm.data);
+      console.groupEnd();
       return Promise.reject(norm);
     }
   );
+
 
   return instance;
 }

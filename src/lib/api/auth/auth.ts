@@ -1,31 +1,5 @@
 import { apiClient } from "../client";
-
-export interface LoginRequest {
-  username: string;
-  password: string;
-}
-
-export interface RegisterRequest {
-  username: string;
-  password: string;
-}
-
-export interface User {
-  userId: string;
-  username: string;
-  role: string;
-}
-
-export interface AuthResponse {
-  success: boolean;
-  message: string;
-}
-
-export interface MeResponse {
-  success: boolean;
-  message: string;
-  user: User;
-}
+import { LoginRequest, RegisterRequest, AuthResponse, MeResponse } from "./types";
 
 export function registerApi(payload: RegisterRequest): Promise<AuthResponse> {
   return apiClient.post("/auth/web/register", payload);
