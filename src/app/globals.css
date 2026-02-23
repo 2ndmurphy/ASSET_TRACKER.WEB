@@ -19,8 +19,63 @@
   }
 }
 
+/* prevent any tiny page-level horizontal overflow as fallback */
+html,
+body {
+  overflow-x: hidden;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: none;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* custom-scroll: gradient thumb for webkit and reasonable fallback for firefox */
+.custom-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(96, 165, 250, 0.9) transparent;
+}
+
+/* WebKit (Chrome, Edge, Safari) */
+.custom-scroll::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 9999px;
+}
+
+/* gradient thumb: blue-400 -> purple-400 */
+.custom-scroll::-webkit-scrollbar-thumb {
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #60a5fa 0%, #a855f7 100%);
+  border: 2px solid transparent;
+  /* prevents jumpy edges on some backgrounds */
+  background-clip: padding-box;
+}
+
+/* hover slightly darker */
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+  opacity: 0.95;
 }
