@@ -1,5 +1,7 @@
 export interface DashboardSummary {
   totalActiveAssets: number;
+  totalPendingCommission: number;
+  totalInstock: number;
   totalInTransit: number;
   totalMissing: number;
 }

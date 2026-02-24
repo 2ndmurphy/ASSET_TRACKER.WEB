@@ -24,10 +24,6 @@ export default function DashboardPageContent() {
             Welcome back, here's what's happening today.
           </p>
         </div>
-        {/* <button className="bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-6 py-2.5 rounded-xl font-medium transition-all shadow-lg shadow-blue-500/20 flex items-center gap-2">
-          <Plus size={20} />
-          New Asset
-        </button> */}
       </div>
 
       {loading ? (
@@ -52,14 +48,14 @@ export default function DashboardPageContent() {
           <>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               <StatCard
-                title="Total Active Assets"
-                value={data.summary.totalActiveAssets}
-                icon={<Package size={24} />}
+                title="Total In Stock (linked)"
+                value={data.summary.totalInStock}
+                icon={<Package className="text-green-400" size={24} />}
               />
               <StatCard
-                title="Total In Transit"
-                value={data.summary.totalInTransit}
-                icon={<Van className="text-yellow-400" size={24} />}
+                title="Total Pending Commission"
+                value={data.summary.totalPendingCommission}
+                icon={<AlertCircle className="text-yellow-400" size={24} />}
               />
               <StatCard
                 title="Total Missing"
@@ -70,6 +66,11 @@ export default function DashboardPageContent() {
                     ? "border-rose-500/50 bg-rose-500/5 text-rose-400"
                     : ""
                 }
+              />
+              <StatCard
+                title="Total In Transit"
+                value={data.summary.totalInTransit}
+                icon={<Van size={24} />}
               />
             </div>
 
