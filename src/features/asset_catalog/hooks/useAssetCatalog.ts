@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { getAssetCatalogService } from "../services/assetService";
-import { AssetCatalogResponse } from "@/src/lib/api/asset_management/types";
+import { AssetCatalogResponse } from "@/src/types/assetTypes";
 import { NormalizedError } from "@/src/lib/api/client";
 
 export function useAssetCatalog(pageNumber: number, pageSize: number, search?: string) {

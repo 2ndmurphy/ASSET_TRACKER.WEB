@@ -7,7 +7,7 @@ import {
   registerApi,
   User,
   getMeApi,
-} from "@/src/lib/api/auth/auth";
+} from "@/src/lib/api/auth";
 
 import { clearTokenCookie } from "@/src/lib/api/client";
 

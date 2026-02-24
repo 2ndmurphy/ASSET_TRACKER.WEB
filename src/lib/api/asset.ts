@@ -1,10 +1,10 @@
-import { apiClient } from "../client";
+import { apiClient } from "./client";
 import {
   AssetCatalogResponse,
   SingleAssetResponse,
   CreateAssetRequest,
   UpdateAssetRequest
-} from "./types";
+} from "../../types/assetTypes";
 
 export const getAssetCatalog = async (pageNumber: number, pageSize: number, search?: string) => {
   const params = new URLSearchParams();

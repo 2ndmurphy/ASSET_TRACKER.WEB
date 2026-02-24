@@ -1,19 +1,19 @@
 import { useState, useCallback } from "react";
-import { createAssetService } from "../services/assetService";
-import { AssetItem, CreateAssetRequest } from "@/src/types/assetTypes";
+import { updateLocationService } from "../services/locationService";
+import { LocationItem, UpdateLocationRequest } from "@/src/types/locationTypes";
 import { NormalizedError } from "@/src/lib/api/client";
 
-export function useCreateAsset() {
-  const [data, setData] = useState<AssetItem | null>(null);
+export function useUpdateLocation() {
+  const [data, setData] = useState<LocationItem | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<NormalizedError | null>(null);
 
-  const createAsset = useCallback(async (params: CreateAssetRequest) => {
+  const updateLocation = useCallback(async (params: UpdateLocationRequest) => {
     setLoading(true);
     setError(null);
     try {
-      const createAssetData = await createAssetService(params);
-      setData(createAssetData);
+      const updateLocationData = await updateLocationService(params);
+      setData(updateLocationData);
     } catch (err) {
       setError(err as NormalizedError);
       throw err;
@@ -26,6 +26,6 @@ export function useCreateAsset() {
     data,
     loading,
     error,
-    createAsset
+    updateLocation
   };
 }

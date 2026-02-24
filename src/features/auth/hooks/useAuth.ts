@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { loginService, registerService } from "../services/authService";
 import { NormalizedError } from "@/src/lib/api/client";
-import { LoginRequest, RegisterRequest } from "@/src/lib/api/auth/auth";
+import { LoginRequest, RegisterRequest } from "@/src/lib/api/auth";
 
 export function useAuth() {
   const [loading, setLoading] = useState(false);

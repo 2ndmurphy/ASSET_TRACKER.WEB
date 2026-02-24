@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { getAssetByIdService } from "../services/assetService";
-import { AssetItem } from "@/src/lib/api/asset_management/types";
+import { AssetItem } from "@/src/types/assetTypes";
 import { NormalizedError } from "@/src/lib/api/client";
 
 export function useAssetById(assetId: number) {

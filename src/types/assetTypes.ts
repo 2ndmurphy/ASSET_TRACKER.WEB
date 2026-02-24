@@ -12,14 +12,14 @@ export interface AssetItem {
 
 export interface CreateAssetRequest {
   assetCode: string,
-  assetName: string,
+  name: string,
   description: string,
   metadata: any,
 }
 
 export interface UpdateAssetRequest{
   id: number,
-  assetName: string,
+  name: string,
   status: string,
   metadata: any,
 }

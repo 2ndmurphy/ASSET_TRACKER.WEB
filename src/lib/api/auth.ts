@@ -1,5 +1,5 @@
-import { apiClient } from "../client";
-import { LoginRequest, RegisterRequest, AuthResponse, MeResponse } from "./types";
+import { apiClient } from "./client";
+import { LoginRequest, RegisterRequest, AuthResponse, MeResponse } from "../../types/authTypes";
 
 export function registerApi(payload: RegisterRequest): Promise<AuthResponse> {
   return apiClient.post("/auth/web/register", payload);

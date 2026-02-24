@@ -14,18 +14,22 @@ import {
   ShieldQuestionMark,
   History,
   Settings,
-  Plus
+  Plus,
 } from "lucide-react";
 import NavItem from "../ui/NavItem";
 import { useAuthContext } from "@/src/features/auth/context/AuthContext";
 import { usePathname } from "next/navigation";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const { user, logout, isHydrated } = useAuthContext();
   const pathname = usePathname();
 
   return (
-    <div className="min-h-screen w-screen bg-[#0f172a] text-slate-200 flex overflow-hidden overflow-x-hidden">
+    <div className="min-h-screen w-screen bg-[#0f172a] text-slate-200 flex overflow-hidden overflow-x-hidden overflow-y-hidden">
       {/* Dynamic Background */}
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-blue-600/10 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-purple-600/10 blur-[120px] pointer-events-none" />
@@ -39,50 +43,49 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
 
         <nav className="flex-1 px-4 space-y-2">
-          <NavItem 
-            icon={<LayoutDashboard size={20} />} 
-            label="Dashboard" 
-            href="/dashboard" 
-            active={pathname === "/dashboard"} 
+          <NavItem
+            icon={<LayoutDashboard size={20} />}
+            label="Dashboard"
+            href="/dashboard"
+            active={pathname === "/dashboard"}
           />
-          <NavItem 
-            icon={<Package size={20} />} 
-            label="Asset Catalog" 
-            href="/asset_management" 
-            active={pathname === "/asset_management"} 
+          <NavItem
+            icon={<Package size={20} />}
+            label="Asset Catalog"
+            href="/asset_management"
+            active={pathname === "/asset_management"}
           />
-          <NavItem 
-            icon={<MapPin size={20} />} 
-            label="Location Management" 
-            href="/location_management" 
-            active={pathname === "/location_management"} 
+          <NavItem
+            icon={<MapPin size={20} />}
+            label="Location Management"
+            href="/location_management"
+            active={pathname === "/location_management"}
           />
-          <NavItem 
-            icon={<Smartphone size={20} />} 
-            label="Device Management" 
-            href="/device_management" 
-            active={pathname === "/device_management"} 
+          <NavItem
+            icon={<Smartphone size={20} />}
+            label="Device Management"
+            href="/device_management"
+            active={pathname === "/device_management"}
           />
-          <NavItem 
-            icon={<ShieldQuestionMark size={20} />} 
-            label="Audit & Reporting" 
-            href="/audit_&_reporting" 
-            active={pathname === "/audit_&_reporting"} 
+          <NavItem
+            icon={<ShieldQuestionMark size={20} />}
+            label="Audit & Reporting"
+            href="/audit_&_reporting"
+            active={pathname === "/audit_&_reporting"}
           />
-          <NavItem 
-            icon={<History size={20} />} 
-            label="Scan History" 
-            href="/scan_history" 
-            active={pathname === "/scan_history"} 
+          <NavItem
+            icon={<History size={20} />}
+            label="Scan History"
+            href="/scan_history"
+            active={pathname === "/scan_history"}
           />
-          <NavItem 
-            icon={<Settings size={20} />} 
-            label="Settings" 
-            href="/settings" 
-            active={pathname === "/settings"} 
+          <NavItem
+            icon={<Settings size={20} />}
+            label="Settings"
+            href="/settings"
+            active={pathname === "/settings"}
           />
         </nav>
-
 
         <div className="p-4 border-t border-white/10">
           <button
@@ -100,7 +103,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Header */}
         <header className="h-16 bg-white/5 backdrop-blur-md border-b border-white/10 flex items-center justify-between px-8">
           <div className="relative w-96">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+            <Search
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+              size={18}
+            />
             <input
               type="text"
               placeholder="Search assets..."
@@ -121,7 +127,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   </div>
                 ) : (
                   <>
-                    <p className="text-sm font-medium text-white">{user.username}</p>
+                    <p className="text-sm font-medium text-white">
+                      {user.username}
+                    </p>
                     <p className="text-xs text-slate-400">{user.role}</p>
                   </>
                 )}

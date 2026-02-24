@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { updateAssetService } from "../services/assetService";
-import { AssetItem, UpdateAssetRequest } from "@/src/lib/api/asset_management/types";
+import { AssetItem, UpdateAssetRequest } from "@/src/types/assetTypes";
 import { NormalizedError } from "@/src/lib/api/client";
 
 export function useUpdateAsset() {
@@ -16,6 +16,7 @@ export function useUpdateAsset() {
       setData(updateAssetData);
     } catch (err) {
       setError(err as NormalizedError);
+      throw err;
     } finally {
       setLoading(false);
     }

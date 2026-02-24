@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
-import { User } from "@/src/lib/api/auth/auth";
+import { User } from "@/src/lib/api/auth";
 import { getMeService, logoutService } from "../services/authService";
 import { useRouter, usePathname } from "next/navigation";
 

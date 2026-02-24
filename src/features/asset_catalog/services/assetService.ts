@@ -1,5 +1,5 @@
-import { getAssetCatalog, getAssetById, createAsset, updateAsset } from "@/src/lib/api/asset_management/asset";
-import { AssetItem, AssetCatalogResponse, CreateAssetRequest, UpdateAssetRequest } from "@/src/lib/api/asset_management/types";
+import { getAssetCatalog, getAssetById, createAsset, updateAsset } from "@/src/lib/api/asset";
+import { AssetItem, AssetCatalogResponse, CreateAssetRequest, UpdateAssetRequest } from "@/src/types/assetTypes";
 
 export async function getAssetCatalogService(pageNumber: number, pageSize: number, search?: string): Promise<AssetCatalogResponse> {
   const response = await getAssetCatalog(pageNumber, pageSize, search);

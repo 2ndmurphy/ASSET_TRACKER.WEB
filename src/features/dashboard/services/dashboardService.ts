@@ -1,4 +1,4 @@
-import { getOverviewData } from "@/src/lib/api/dashboard/dashboard";
+import { getOverviewData } from "@/src/lib/api/dashboard";
 import { DashboardOverviewData } from "@/src/lib/api/dashboard/types";
 
 export async function getDashboardOverviewService(): Promise<DashboardOverviewData> {

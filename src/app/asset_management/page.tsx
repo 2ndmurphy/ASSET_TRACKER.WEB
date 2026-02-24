@@ -1,13 +1,36 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useAssetCatalog } from "@/src/features/asset_catalog/hooks/useAssetCatalog";
 import { useCreateAsset } from "@/src/features/asset_catalog/hooks/useCreateAsset";
 import { useUpdateAsset } from "@/src/features/asset_catalog/hooks/useUpdateAsset";
-import AssetTable from "@/src/features/asset_catalog/components/AssetTable";
-import AssetFormSidebar from "@/src/features/asset_catalog/components/AssetFormSidebar";
-import { Search, Plus, ChevronLeft, ChevronRight, SlidersHorizontal, Package, RefreshCw } from "lucide-react";
-import { AssetItem } from "@/src/lib/api/asset_management/types";
+import DataTable, { ColumnDef } from "@/src/components/ui/DataTable";
+import ActionFormSidebar from "@/src/components/ui/ActionFormSidebar";
+import AssetFormFields from "@/src/features/asset_catalog/components/AssetFormFields";
+import {
+  Search,
+  Plus,
+  ChevronLeft,
+  ChevronRight,
+  SlidersHorizontal,
+  Package,
+  RefreshCw,
+} from "lucide-react";
+import { Eye, Edit2, MoreVertical, MapPin, Tag, Clock } from "lucide-react";
+import { AssetItem } from "@/src/types/assetTypes";
+
+function getStatusStyles(status: string) {
+  switch (status.toLowerCase()) {
+    case "active":
+      return "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+    case "in-transit":
+      return "bg-amber-500/10 text-amber-400 border-amber-500/20";
+    case "missing":
+      return "bg-rose-500/10 text-rose-400 border-rose-500/20";
+    default:
+      return "bg-slate-500/10 text-slate-400 border-slate-500/20";
+  }
+}
 
 export default function AssetManagementPage() {
   const [page, setPage] = useState(1);
@@ -15,8 +38,18 @@ export default function AssetManagementPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [editingAsset, setEditingAsset] = useState<AssetItem | null>(null);
-  
-  const { data, loading, error, refresh } = useAssetCatalog(page, pageSize, searchTerm);
+  const [formData, setFormData] = useState<Partial<AssetItem>>({
+    assetCode: "",
+    assetName: "",
+    description: "",
+    lifecycleStatus: "Active",
+  });
+
+  const { data, loading, error, refresh } = useAssetCatalog(
+    page,
+    pageSize,
+    searchTerm,
+  );
   const { createAsset, loading: isCreating } = useCreateAsset();
   const { updateAsset, loading: isUpdating } = useUpdateAsset();
 
@@ -28,40 +61,150 @@ export default function AssetManagementPage() {
 
   const handleAddClick = () => {
     setEditingAsset(null);
+    setFormData({
+      assetCode: "",
+      assetName: "",
+      description: "",
+      lifecycleStatus: "Active",
+    });
     setIsSidebarOpen(true);
   };
 
   const handleEditClick = (asset: AssetItem) => {
     setEditingAsset(asset);
+    setFormData(asset);
     setIsSidebarOpen(true);
   };
 
-  const handleSave = async (formData: any) => {
+  const handleView = (id: number) => {
+    // Implement view logic or navigation
+    console.log("View asset", id);
+  };
+
+  const columns = useMemo<ColumnDef<AssetItem>[]>(
+    () => [
+      {
+        id: "asset",
+        header: "Asset",
+        cell: (row) => (
+          <div className="flex flex-col">
+            <span className="text-sm font-medium text-white">
+              {row.assetName}
+            </span>
+            <span className="text-xs text-slate-500 font-mono mt-0.5">
+              {row.assetCode}
+            </span>
+          </div>
+        ),
+      },
+      {
+        id: "epc",
+        header: "EPC / Tag",
+        cell: (row) => (
+          <span className="text-xs text-slate-400 font-mono bg-white/5 px-2 py-1 rounded border border-white/5">
+            {row.linkedEpc || "Unassigned"}
+          </span>
+        ),
+      },
+      {
+        id: "status",
+        header: "Status",
+        cell: (row) => (
+          <span
+            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-medium border ${getStatusStyles(row.lifecycleStatus)}`}
+          >
+            {row.lifecycleStatus}
+          </span>
+        ),
+      },
+      {
+        id: "location",
+        header: "Location",
+        accessor: "currentLocation",
+        cell: (row) => (
+          <div className="flex items-center gap-2 text-slate-400 text-sm">
+            <MapPin size={14} className="text-blue-400" />
+            <span>{row.currentLocation}</span>
+          </div>
+        ),
+      },
+      {
+        id: "lastSeen",
+        header: "Last Seen",
+        accessor: "lastSeenAt",
+        cell: (row) => (
+          <div className="flex items-center gap-2 text-slate-400 text-xs">
+            <Clock size={14} />
+            <span>
+              {new Date(row.lastSeenAt).toLocaleString([], {
+                dateStyle: "short",
+                timeStyle: "short",
+              })}
+            </span>
+          </div>
+        ),
+      },
+      {
+        id: "actions",
+        header: "Action",
+        className: "text-right",
+        cell: (row) => (
+          <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleView(row.id);
+              }}
+              className="p-2 hover:bg-blue-500/20 hover:text-blue-400 text-slate-400 rounded-lg transition-colors"
+              title="View Details"
+            >
+              <Eye size={16} />
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleEditClick(row);
+              }}
+              className="p-2 hover:bg-amber-500/20 hover:text-amber-400 text-slate-400 rounded-lg transition-colors"
+              title="Edit Asset"
+            >
+              <Edit2 size={16} />
+            </button>
+          </div>
+        ),
+      },
+    ],
+    [],
+  );
+
+  const handleSave = async () => {
     try {
       if (editingAsset) {
         await updateAsset({
           id: editingAsset.id,
-          assetName: formData.assetName,
-          status: formData.lifecycleStatus,
-          metadata: formData.metadata || {}
+          name: formData.assetCode || "",
+          status: formData.lifecycleStatus || "Active",
+          metadata: null,
         });
       } else {
         await createAsset({
-          assetCode: formData.assetCode,
-          assetName: formData.assetName,
-          description: formData.description,
-          metadata: {}
+          assetCode: formData.assetCode || "",
+          name: formData.assetName || "",
+          description: formData.description || "",
+          metadata: null,
         });
       }
+
       setIsSidebarOpen(false);
       refresh();
     } catch (err) {
-      // TODO: show a toast here
-      console.error("Save failed:", err);
+      console.error("Save operation failed in component:", err);
     }
   };
 
-  const totalPages = data?.data?.totalCount ? Math.ceil(data.data.totalCount / pageSize) : 0;
+  const totalPages = data?.data?.totalCount
+    ? Math.ceil(data.data.totalCount / pageSize)
+    : 0;
 
   return (
     <div className="space-y-6">
@@ -72,14 +215,19 @@ export default function AssetManagementPage() {
             <Package className="text-blue-500" />
             Asset Catalog
           </h2>
-          <p className="text-slate-400 text-sm">Manage and track your organization&apos;s assets in real-time.</p>
+          <p className="text-slate-400 text-sm">
+            Manage and track your organization&apos;s assets in real-time.
+          </p>
         </div>
-        
-        <button 
+
+        <button
           onClick={handleAddClick}
           className="bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-xl font-medium transition-all shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2 group active:scale-95"
         >
-          <Plus size={20} className="group-hover:rotate-90 transition-transform duration-300" />
+          <Plus
+            size={20}
+            className="group-hover:rotate-90 transition-transform duration-300"
+          />
           Add New Asset
         </button>
       </div>
@@ -87,7 +235,10 @@ export default function AssetManagementPage() {
       {/* Filters & Search Section */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/5 border border-white/10 p-4 rounded-2xl backdrop-blur-md">
         <form onSubmit={handleSearch} className="relative w-full sm:max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
+          <Search
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"
+            size={18}
+          />
           <input
             type="text"
             placeholder="Search by code or name..."
@@ -96,9 +247,9 @@ export default function AssetManagementPage() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </form>
-        
+
         <div className="flex items-center gap-3 w-full sm:w-auto">
-          <button 
+          <button
             onClick={() => refresh()}
             className="p-2.5 bg-white/5 border border-white/10 rounded-xl text-slate-400 hover:bg-white/10 transition-colors"
             title="Refresh"
@@ -111,7 +262,9 @@ export default function AssetManagementPage() {
           </button>
           <div className="h-8 w-px bg-white/10 hidden sm:block"></div>
           <span className="text-xs text-slate-500 font-medium whitespace-nowrap">
-            {data?.data?.items ? `Showing ${data.data.items.length} of ${data.data.totalCount}` : "Loading..."}
+            {data?.data?.items
+              ? `Showing ${data.data.items.length} of ${data.data.totalCount}`
+              : "Loading..."}
           </span>
         </div>
       </div>
@@ -123,76 +276,97 @@ export default function AssetManagementPage() {
         </div>
       ) : error ? (
         <div className="p-8 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-center">
-             <p className="text-rose-400 font-medium mb-4">Error loading assets: {error.message}</p>
-             <button 
-                onClick={() => refresh()}
-                className="px-4 py-2 bg-rose-500/20 text-rose-300 rounded-lg hover:bg-rose-500/30 transition-colors text-sm"
-             >
-                Try Again
-             </button>
+          <p className="text-rose-400 font-medium mb-4">
+            Error loading assets: {error.message}
+          </p>
+          <button
+            onClick={() => refresh()}
+            className="px-4 py-2 bg-rose-500/20 text-rose-300 rounded-lg hover:bg-rose-500/30 transition-colors text-sm"
+          >
+            Try Again
+          </button>
         </div>
-      ) : data?.data?.items && (
-        <>
-          <AssetTable 
-            assets={data.data.items} 
-            onEdit={handleEditClick}
-          />
+      ) : (
+        data?.data?.items && (
+          <>
+            <DataTable
+              data={data.data.items}
+              columns={columns}
+              rowKey={(row) => row.id}
+              onRowClick={(row) => handleEditClick(row)}
+            />
 
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-between pt-4">
-              <p className="text-sm text-slate-500">
-                Page <span className="text-slate-300 font-medium">{page}</span> of <span className="text-slate-300 font-medium">{totalPages}</span>
-              </p>
-              
-              <div className="flex items-center gap-2">
-                <button
-                  disabled={page <= 1}
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  className="p-2 bg-white/5 border border-white/10 rounded-lg text-slate-400 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors shadow-sm"
-                >
-                  <ChevronLeft size={20} />
-                </button>
-                
-                {[...Array(Math.min(5, totalPages))].map((_, i) => {
-                  const pageNum = i + 1;
-                  return (
-                    <button
-                      key={pageNum}
-                      onClick={() => setPage(pageNum)}
-                      className={`w-10 h-10 rounded-lg text-sm font-medium transition-all ${
-                        page === pageNum 
-                          ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" 
-                          : "bg-white/5 text-slate-400 hover:bg-white/10"
-                      }`}
-                    >
-                      {pageNum}
-                    </button>
-                  );
-                })}
-                
-                <button
-                  disabled={page >= totalPages}
-                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                  className="p-2 bg-white/5 border border-white/10 rounded-lg text-slate-400 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors shadow-sm"
-                >
-                  <ChevronRight size={20} />
-                </button>
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between pt-4">
+                <p className="text-sm text-slate-500">
+                  Page{" "}
+                  <span className="text-slate-300 font-medium">{page}</span> of{" "}
+                  <span className="text-slate-300 font-medium">
+                    {totalPages}
+                  </span>
+                </p>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    disabled={page <= 1}
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    className="p-2 bg-white/5 border border-white/10 rounded-lg text-slate-400 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors shadow-sm"
+                  >
+                    <ChevronLeft size={20} />
+                  </button>
+
+                  {[...Array(Math.min(5, totalPages))].map((_, i) => {
+                    const pageNum = i + 1;
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => setPage(pageNum)}
+                        className={`w-10 h-10 rounded-lg text-sm font-medium transition-all ${
+                          page === pageNum
+                            ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
+                            : "bg-white/5 text-slate-400 hover:bg-white/10"
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+
+                  <button
+                    disabled={page >= totalPages}
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    className="p-2 bg-white/5 border border-white/10 rounded-lg text-slate-400 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors shadow-sm"
+                  >
+                    <ChevronRight size={20} />
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
-        </>
+            )}
+          </>
+        )
       )}
 
-      {/* Asset Form Sidebar */}
-      <AssetFormSidebar
+      {/* Generic Action Form Sidebar */}
+      <ActionFormSidebar
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
-        asset={editingAsset}
+        title={editingAsset ? "Edit Asset" : "Add New Asset"}
+        subtitle={
+          editingAsset
+            ? `Updating ${editingAsset.assetCode}`
+            : "Fill in the details to create a new asset."
+        }
         onSave={handleSave}
         isSaving={isCreating || isUpdating}
-      />
+        submitLabel={editingAsset ? "Update Asset" : "Save Asset"}
+      >
+        <AssetFormFields
+          formData={formData}
+          setFormData={setFormData}
+          isEdit={!!editingAsset}
+        />
+      </ActionFormSidebar>
     </div>
   );
 }
-
