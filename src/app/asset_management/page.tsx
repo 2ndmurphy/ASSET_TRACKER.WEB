@@ -7,16 +7,15 @@ import { useUpdateAsset } from "@/src/features/asset_catalog/hooks/useUpdateAsse
 import DataTable, { ColumnDef } from "@/src/components/ui/DataTable";
 import ActionFormSidebar from "@/src/components/ui/ActionFormSidebar";
 import AssetFormFields from "@/src/features/asset_catalog/components/AssetFormFields";
+import Pagination from "@/src/components/ui/Pagination";
 import {
   Search,
   Plus,
-  ChevronLeft,
-  ChevronRight,
-  SlidersHorizontal,
   Package,
   RefreshCw,
+  SlidersHorizontal,
 } from "lucide-react";
-import { Eye, Edit2, MoreVertical, MapPin, Tag, Clock } from "lucide-react";
+import { Eye, Edit2, MapPin, Clock, RefreshCcw } from "lucide-react";
 import { AssetItem } from "@/src/types/assetTypes";
 
 function getStatusStyles(status: string) {
@@ -77,7 +76,7 @@ export default function AssetManagementPage() {
   };
 
   const handleView = (id: number) => {
-    // Implement view logic or navigation
+    // TODO: Implement view logic or navigation
     console.log("View asset", id);
   };
 
@@ -124,7 +123,7 @@ export default function AssetManagementPage() {
         cell: (row) => (
           <div className="flex items-center gap-2 text-slate-400 text-sm">
             <MapPin size={14} className="text-blue-400" />
-            <span>{row.currentLocation}</span>
+            <span>{row.currentLocation || "Not added yet"}</span>
           </div>
         ),
       },
@@ -202,9 +201,9 @@ export default function AssetManagementPage() {
     }
   };
 
-  const totalPages = data?.data?.totalCount
-    ? Math.ceil(data.data.totalCount / pageSize)
-    : 0;
+  const totalCount = data?.data?.totalCount ?? 0;
+  const safePageSize = pageSize > 0 ? pageSize : 1;
+  const totalPages = Math.ceil(totalCount / safePageSize);
 
   return (
     <div className="space-y-6">
@@ -296,53 +295,13 @@ export default function AssetManagementPage() {
               onRowClick={(row) => handleEditClick(row)}
             />
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex items-center justify-between pt-4">
-                <p className="text-sm text-slate-500">
-                  Page{" "}
-                  <span className="text-slate-300 font-medium">{page}</span> of{" "}
-                  <span className="text-slate-300 font-medium">
-                    {totalPages}
-                  </span>
-                </p>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    disabled={page <= 1}
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    className="p-2 bg-white/5 border border-white/10 rounded-lg text-slate-400 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors shadow-sm"
-                  >
-                    <ChevronLeft size={20} />
-                  </button>
-
-                  {[...Array(Math.min(5, totalPages))].map((_, i) => {
-                    const pageNum = i + 1;
-                    return (
-                      <button
-                        key={pageNum}
-                        onClick={() => setPage(pageNum)}
-                        className={`w-10 h-10 rounded-lg text-sm font-medium transition-all ${
-                          page === pageNum
-                            ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
-                            : "bg-white/5 text-slate-400 hover:bg-white/10"
-                        }`}
-                      >
-                        {pageNum}
-                      </button>
-                    );
-                  })}
-
-                  <button
-                    disabled={page >= totalPages}
-                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                    className="p-2 bg-white/5 border border-white/10 rounded-lg text-slate-400 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors shadow-sm"
-                  >
-                    <ChevronRight size={20} />
-                  </button>
-                </div>
-              </div>
-            )}
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              onPageChange={setPage}
+              totalCount={totalCount}
+              pageSize={pageSize}
+            />
           </>
         )
       )}

@@ -8,7 +8,7 @@ import {
 
 export const getLocationManagement = async (pageNumber: number, pageSize: number, search?: string) => {
   const params = new URLSearchParams();
-  if (pageNumber) params.append("pageNumber", pageNumber.toString());
+  if (pageNumber) params.append("page", pageNumber.toString());
   if (pageSize) params.append("pageSize", pageSize.toString());
   if (search) params.append("search", search);
 

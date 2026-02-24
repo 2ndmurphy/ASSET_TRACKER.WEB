@@ -7,14 +7,13 @@ import { useUpdateLocation } from "@/src/features/location_management/hooks/useU
 import DataTable, { ColumnDef } from "@/src/components/ui/DataTable";
 import ActionFormSidebar from "@/src/components/ui/ActionFormSidebar";
 import LocationFormFields from "@/src/features/location_management/components/LocationFormFields";
+import Pagination from "@/src/components/ui/Pagination";
 import {
   Search,
   Plus,
-  ChevronLeft,
-  ChevronRight,
-  SlidersHorizontal,
   Package,
   RefreshCw,
+  SlidersHorizontal,
   BookText,
 } from "lucide-react";
 import { Eye, Edit2, MoreVertical, MapPin, Tag, Clock } from "lucide-react";
@@ -33,7 +32,7 @@ function getStatusStyles(status: string) {
   }
 }
 
-export default function AssetManagementPage() {
+export default function LocationManagementPage() {
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
@@ -182,9 +181,9 @@ export default function AssetManagementPage() {
     }
   };
 
-  const totalPages = data?.data?.totalCount
-    ? Math.ceil(data.data.totalCount / pageSize)
-    : 0;
+  const totalCount = data?.data?.totalCount ?? 0;
+  const safePageSize = pageSize > 0 ? pageSize : 1;
+  const totalPages = Math.ceil(totalCount / safePageSize);
 
   return (
     <div className="space-y-6">
@@ -276,53 +275,13 @@ export default function AssetManagementPage() {
               onRowClick={(row) => handleEditClick(row)}
             />
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex items-center justify-between pt-4">
-                <p className="text-sm text-slate-500">
-                  Page{" "}
-                  <span className="text-slate-300 font-medium">{page}</span> of{" "}
-                  <span className="text-slate-300 font-medium">
-                    {totalPages}
-                  </span>
-                </p>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    disabled={page <= 1}
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    className="p-2 bg-white/5 border border-white/10 rounded-lg text-slate-400 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors shadow-sm"
-                  >
-                    <ChevronLeft size={20} />
-                  </button>
-
-                  {[...Array(Math.min(5, totalPages))].map((_, i) => {
-                    const pageNum = i + 1;
-                    return (
-                      <button
-                        key={pageNum}
-                        onClick={() => setPage(pageNum)}
-                        className={`w-10 h-10 rounded-lg text-sm font-medium transition-all ${
-                          page === pageNum
-                            ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
-                            : "bg-white/5 text-slate-400 hover:bg-white/10"
-                        }`}
-                      >
-                        {pageNum}
-                      </button>
-                    );
-                  })}
-
-                  <button
-                    disabled={page >= totalPages}
-                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                    className="p-2 bg-white/5 border border-white/10 rounded-lg text-slate-400 hover:bg-white/10 disabled:opacity-30 disabled:cursor-not-allowed transition-colors shadow-sm"
-                  >
-                    <ChevronRight size={20} />
-                  </button>
-                </div>
-              </div>
-            )}
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              onPageChange={setPage}
+              totalCount={totalCount}
+              pageSize={pageSize}
+            />
           </>
         )
       )}
