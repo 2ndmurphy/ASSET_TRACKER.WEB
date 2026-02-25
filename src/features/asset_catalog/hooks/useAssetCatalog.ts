@@ -3,7 +3,11 @@ import { getAssetCatalogService } from "../services/assetService";
 import { AssetCatalogResponse } from "@/src/types/assetTypes";
 import { NormalizedError } from "@/src/lib/api/client";
 
-export function useAssetCatalog(pageNumber: number, pageSize: number, search?: string) {
+export function useAssetCatalog(
+  pageNumber: number,
+  pageSize: number,
+  search?: string,
+) {
   const [data, setData] = useState<AssetCatalogResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<NormalizedError | null>(null);
@@ -12,7 +16,11 @@ export function useAssetCatalog(pageNumber: number, pageSize: number, search?: s
     setLoading(true);
     setError(null);
     try {
-      const assetCatalogData = await getAssetCatalogService(pageNumber, pageSize, search);
+      const assetCatalogData = await getAssetCatalogService(
+        pageNumber,
+        pageSize,
+        search,
+      );
       setData(assetCatalogData);
     } catch (err) {
       setError(err as NormalizedError);
@@ -29,6 +37,6 @@ export function useAssetCatalog(pageNumber: number, pageSize: number, search?: s
     data,
     loading,
     error,
-    refresh: fetchAssetCatalog
+    refresh: fetchAssetCatalog,
   };
 }

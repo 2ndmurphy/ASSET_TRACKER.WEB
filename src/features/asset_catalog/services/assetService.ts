@@ -1,10 +1,26 @@
-import { getAssetCatalog, getAssetById, createAsset, updateAsset } from "@/src/lib/api/asset";
-import { AssetItem, AssetCatalogResponse, CreateAssetRequest, UpdateAssetRequest } from "@/src/types/assetTypes";
+import {
+  getAssetCatalog,
+  getAssetById,
+  createAsset,
+  updateAsset,
+  bulkImportAssets,
+} from "@/src/lib/api/asset";
+import {
+  AssetItem,
+  AssetCatalogResponse,
+  CreateAssetRequest,
+  UpdateAssetRequest,
+  BulkImportAssetsResponse,
+} from "@/src/types/assetTypes";
 
-export async function getAssetCatalogService(pageNumber: number, pageSize: number, search?: string): Promise<AssetCatalogResponse> {
+export async function getAssetCatalogService(
+  pageNumber: number,
+  pageSize: number,
+  search?: string,
+): Promise<AssetCatalogResponse> {
   const response = await getAssetCatalog(pageNumber, pageSize, search);
 
-  if (!response.success) {
+  if (response && response.success === false) {
     throw new Error(response.message || "Failed to fetch asset catalog");
   }
 
@@ -21,7 +37,9 @@ export async function getAssetByIdService(assetId: number): Promise<AssetItem> {
   return response.data;
 }
 
-export async function createAssetService(params: CreateAssetRequest): Promise<AssetItem> {
+export async function createAssetService(
+  params: CreateAssetRequest,
+): Promise<AssetItem> {
   const response = await createAsset(params);
 
   if (!response.success) {
@@ -31,7 +49,9 @@ export async function createAssetService(params: CreateAssetRequest): Promise<As
   return response.data;
 }
 
-export async function updateAssetService(params: UpdateAssetRequest): Promise<AssetItem> {
+export async function updateAssetService(
+  params: UpdateAssetRequest,
+): Promise<AssetItem> {
   const response = await updateAsset(params);
 
   if (!response.success) {
@@ -39,4 +59,16 @@ export async function updateAssetService(params: UpdateAssetRequest): Promise<As
   }
 
   return response.data;
+}
+
+export async function bulkImportAssetsService(
+  file: File,
+): Promise<BulkImportAssetsResponse> {
+  const response = await bulkImportAssets(file);
+
+  if (!response.success) {
+    throw new Error(response.message || "Failed to bulk import assets");
+  }
+
+  return response;
 }

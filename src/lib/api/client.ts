@@ -1,4 +1,8 @@
-import axios, { AxiosInstance, AxiosError, InternalAxiosRequestConfig } from "axios";
+import axios, {
+  AxiosInstance,
+  AxiosError,
+  InternalAxiosRequestConfig,
+} from "axios";
 import Cookies from "js-cookie";
 
 export type NormalizedError = {
@@ -8,7 +12,7 @@ export type NormalizedError = {
   data?: any;
   isNetworkError?: boolean;
   originalError?: any;
-}
+};
 
 const TOKEN_COOKIE_NAME = "access_token";
 
@@ -17,12 +21,15 @@ export function getTokenCookie(): string | undefined {
   return Cookies.get(TOKEN_COOKIE_NAME);
 }
 
-export function setTokenCookie(token: string, options?: Cookies.CookieAttributes) {
+export function setTokenCookie(
+  token: string,
+  options?: Cookies.CookieAttributes,
+) {
   const defaultOpts: Cookies.CookieAttributes = {
     expires: 7,
     path: "/",
     secure: process.env.NODE_ENV === "development",
-    sameSite: "lax",
+    sameSite: "none",
   };
   Cookies.set(TOKEN_COOKIE_NAME, token, { ...defaultOpts, ...options });
 }
@@ -38,9 +45,15 @@ function normalizeAxiosError(err: AxiosError | any): NormalizedError {
       // Server responded with a status code outside 2xx
       return {
         status: err.response.status,
-        code: (err.response.data && (err.response.data.code ?? err.response.data.error)) ?? err.code ?? null,
+        code:
+          (err.response.data &&
+            (err.response.data.code ?? err.response.data.error)) ??
+          err.code ??
+          null,
         message:
-          (err.response.data && (err.response.data.message ?? err.response.data.error_description)) ??
+          (err.response.data &&
+            (err.response.data.message ??
+              err.response.data.error_description)) ??
           err.message ??
           "Request failed",
         data: err.response.data,
@@ -89,7 +102,9 @@ export function createApiClient(opts?: {
   instance.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
       try {
-        console.group(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`);
+        console.group(
+          `🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`,
+        );
         console.log("Full URL:", (config.baseURL || "") + config.url);
         console.log("Headers:", config.headers);
         console.log("Data:", config.data);
@@ -114,12 +129,14 @@ export function createApiClient(opts?: {
     (error) => {
       console.error("❌ Request Interceptor Error:", error);
       return Promise.reject(normalizeAxiosError(error));
-    }
+    },
   );
 
   instance.interceptors.response.use(
     (response) => {
-      console.group(`✅ API Response: ${response.config.method?.toUpperCase()} ${response.config.url}`);
+      console.group(
+        `✅ API Response: ${response.config.method?.toUpperCase()} ${response.config.url}`,
+      );
       console.log("Status:", response.status);
       console.log("Body:", response.data);
       console.groupEnd();
@@ -127,22 +144,23 @@ export function createApiClient(opts?: {
     },
     (error) => {
       const norm = normalizeAxiosError(error);
-      console.group(`❌ API Error: ${error.config?.method?.toUpperCase()} ${error.config?.url}`);
+      console.group(
+        `❌ API Error: ${error.config?.method?.toUpperCase()} ${error.config?.url}`,
+      );
       console.log("Status:", norm.status);
       console.log("Message:", norm.message);
       console.log("Data:", norm.data);
       console.groupEnd();
       return Promise.reject(norm);
-    }
+    },
   );
-
 
   return instance;
 }
 
 // Default client (convention)
 export const apiClient = createApiClient({
-  baseURL: "https://localhost:7199/api",
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://localhost:7199/api",
   withCredentials: true,
   attachTokenFromCookie: true,
 });

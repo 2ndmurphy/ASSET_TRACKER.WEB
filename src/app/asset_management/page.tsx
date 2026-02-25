@@ -8,12 +8,14 @@ import DataTable, { ColumnDef } from "@/src/components/ui/DataTable";
 import ActionFormSidebar from "@/src/components/ui/ActionFormSidebar";
 import AssetFormFields from "@/src/features/asset_catalog/components/AssetFormFields";
 import Pagination from "@/src/components/ui/Pagination";
+import AssetImportSidebar from "@/src/features/asset_catalog/components/AssetImportSidebar";
 import {
   Search,
   Plus,
   Package,
   RefreshCw,
   SlidersHorizontal,
+  File,
 } from "lucide-react";
 import { Eye, Edit2, MapPin, Clock, RefreshCcw } from "lucide-react";
 import { AssetItem } from "@/src/types/assetTypes";
@@ -36,6 +38,7 @@ export default function AssetManagementPage() {
   const [pageSize] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isImportSidebarOpen, setIsImportSidebarOpen] = useState(false);
   const [editingAsset, setEditingAsset] = useState<AssetItem | null>(null);
   const [formData, setFormData] = useState<Partial<AssetItem>>({
     assetCode: "",
@@ -43,6 +46,7 @@ export default function AssetManagementPage() {
     description: "",
     lifecycleStatus: "Active",
   });
+  const [file, setFile] = useState<File | null>(null);
 
   const { data, loading, error, refresh } = useAssetCatalog(
     page,
@@ -219,16 +223,29 @@ export default function AssetManagementPage() {
           </p>
         </div>
 
-        <button
-          onClick={handleAddClick}
-          className="bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-xl font-medium transition-all shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2 group active:scale-95"
-        >
-          <Plus
-            size={20}
-            className="group-hover:rotate-90 transition-transform duration-300"
-          />
-          Add New Asset
-        </button>
+        <div className="flex items-center justify-self-center gap-4">
+          <button
+            onClick={() => setIsImportSidebarOpen(true)}
+            className="bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-xl font-medium transition-all shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2 group active:scale-95"
+          >
+            <File
+              size={20}
+              className="group-hover:rotate-90 transition-transform duration-300"
+            />
+            Bulk Import File
+          </button>
+
+          <button
+            onClick={handleAddClick}
+            className="bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-xl font-medium transition-all shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2 group active:scale-95"
+          >
+            <Plus
+              size={20}
+              className="group-hover:rotate-90 transition-transform duration-300"
+            />
+            Add New Asset
+          </button>
+        </div>
       </div>
 
       {/* Filters & Search Section */}
@@ -326,6 +343,16 @@ export default function AssetManagementPage() {
           isEdit={!!editingAsset}
         />
       </ActionFormSidebar>
+
+      <AssetImportSidebar
+        isOpen={isImportSidebarOpen}
+        onClose={() => setIsImportSidebarOpen(false)}
+        onSuccess={() => {
+          refresh();
+          // Optional: Add a brief delay or message then close
+          setTimeout(() => setIsImportSidebarOpen(false), 2000);
+        }}
+      />
     </div>
   );
 }

@@ -2,30 +2,32 @@ import {
   getLocationManagement,
   getLocationById,
   createLocation,
-  updateLocation
+  updateLocation,
 } from "../../../lib/api/location";
 import {
   LocationManagementResponse,
   CreateLocationRequest,
   UpdateLocationRequest,
-  LocationItem
+  LocationItem,
 } from "../../../types/locationTypes";
 
 export const getLocationManagementService = async (
-  pageNumber: number, 
-  pageSize: number, 
-  search?: string): Promise<LocationManagementResponse> => 
-{
+  pageNumber: number,
+  pageSize: number,
+  search?: string,
+): Promise<LocationManagementResponse> => {
   const response = await getLocationManagement(pageNumber, pageSize, search);
 
-  if (!response.success) {
+  if (response && response.success === false) {
     throw new Error(response.message || "Failed to fetch location list");
   }
 
   return response;
-}
+};
 
-export const getLocationByIdService = async (id: number): Promise<LocationItem> => {
+export const getLocationByIdService = async (
+  id: number,
+): Promise<LocationItem> => {
   const response = await getLocationById(id);
 
   if (!response.success) {
@@ -33,9 +35,11 @@ export const getLocationByIdService = async (id: number): Promise<LocationItem> 
   }
 
   return response.data;
-}
+};
 
-export const createLocationService = async (location: CreateLocationRequest): Promise<LocationItem> => {
+export const createLocationService = async (
+  location: CreateLocationRequest,
+): Promise<LocationItem> => {
   const response = await createLocation(location);
 
   if (!response.success) {
@@ -43,9 +47,11 @@ export const createLocationService = async (location: CreateLocationRequest): Pr
   }
 
   return response.data;
-}
+};
 
-export const updateLocationService = async (location: UpdateLocationRequest): Promise<LocationItem> => {
+export const updateLocationService = async (
+  location: UpdateLocationRequest,
+): Promise<LocationItem> => {
   const response = await updateLocation(location);
 
   if (!response.success) {
@@ -53,4 +59,4 @@ export const updateLocationService = async (location: UpdateLocationRequest): Pr
   }
 
   return response.data;
-}
+};

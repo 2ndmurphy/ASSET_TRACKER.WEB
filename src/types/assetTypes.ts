@@ -17,6 +17,15 @@ export interface CreateAssetRequest {
   metadata: any,
 }
 
+export interface BulkImportRequest {
+  file: File,
+}
+
+export interface BulkImportResponse{
+  message: string,
+  totalProcessed: number
+}
+
 export interface UpdateAssetRequest{
   id: number,
   name: string,
@@ -40,3 +49,4 @@ export interface AssetCatalogData {
 
 export type AssetCatalogResponse = ApiResponse<AssetCatalogData>;
 export type SingleAssetResponse = ApiResponse<AssetItem>;
+export type BulkImportAssetsResponse = ApiResponse<BulkImportResponse>;

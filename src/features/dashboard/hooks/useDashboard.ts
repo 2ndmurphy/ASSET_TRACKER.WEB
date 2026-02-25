@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { getDashboardOverviewService } from "../services/dashboardService";
-import { DashboardOverviewData } from "@/src/lib/api/dashboard/types";
+import { DashboardOverviewData } from "@/src/types/dashboardTypes";
 import { NormalizedError } from "@/src/lib/api/client";
 
 export function useDashboard() {
@@ -29,6 +29,6 @@ export function useDashboard() {
     data,
     loading,
     error,
-    refresh: fetchDashboardData
+    refresh: fetchDashboardData,
   };
 }
