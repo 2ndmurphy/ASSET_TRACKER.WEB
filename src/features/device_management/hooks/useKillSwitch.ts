@@ -18,7 +18,7 @@ export function useKillSwitch() {
     } catch (err) {
       setError(err as NormalizedError);
     } finally {
-      setLoading(true);
+      setLoading(false);
     }
   }, []);
 

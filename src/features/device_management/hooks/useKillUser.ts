@@ -3,24 +3,24 @@ import { killUserService } from "../services/deviceService";
 import { DeviceItem, KillOperationRequest } from "@/src/types/deviceTypes";
 import { NormalizedError } from "@/src/lib/api/client";
 
-export function useKillSwitch() {
+export function useKillUser() {
   const [data, setData] = useState<DeviceItem | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<NormalizedError | null>(null);
 
-  const killScan = useCallback(async (scanSessionId: KillOperationRequest) => {
+  const killUser = useCallback(async (userId: KillOperationRequest) => {
     setLoading(true);
     setError(null);
 
     try {
-      const killScanData = await killUserService(scanSessionId);
-      setData(killScanData);
+      const killUserData = await killUserService(userId);
+      setData(killUserData);
     } catch (err) {
       setError(err as NormalizedError);
     } finally {
-      setLoading(true);
+      setLoading(false);
     }
   }, []);
 
-  return { data, loading, error, killScan };
+  return { data, loading, error, killUser };
 }

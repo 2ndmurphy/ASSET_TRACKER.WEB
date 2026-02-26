@@ -16,8 +16,11 @@ import {
   RefreshCw,
   SlidersHorizontal,
   File,
+  Eye,
+  Edit2,
+  MapPin,
+  Clock,
 } from "lucide-react";
-import { Eye, Edit2, MapPin, Clock, RefreshCcw } from "lucide-react";
 import { AssetItem } from "@/src/types/assetTypes";
 
 function getStatusStyles(status: string) {
