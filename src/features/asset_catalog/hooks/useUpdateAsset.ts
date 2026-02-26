@@ -22,10 +22,5 @@ export function useUpdateAsset() {
     }
   }, []);
 
-  return {
-    data,
-    loading,
-    error,
-    updateAsset
-  };
+  return { data, loading, error, updateAsset };
 }

@@ -1,36 +1,36 @@
 export interface AssetItem {
-  id: number,
-  assetCode: string,
-  assetName: string,
-  description: string,
-  lifecycleStatus: string,
-  linkedEpc: string,
-  currentLocation: string,
-  lastSeenAt: string,
-  createdAt: string
+  id: number;
+  assetCode: string;
+  assetName: string;
+  description: string;
+  lifecycleStatus: string;
+  linkedEpc: string;
+  currentLocation: string;
+  lastSeenAt: string;
+  createdAt: string;
 }
 
 export interface CreateAssetRequest {
-  assetCode: string,
-  name: string,
-  description: string,
-  metadata: any,
+  assetCode: string;
+  name: string;
+  description: string;
+  metadata: any;
 }
 
 export interface BulkImportRequest {
-  file: File,
+  file: File;
 }
 
-export interface BulkImportResponse{
-  message: string,
-  totalProcessed: number
+export interface BulkImportResponse {
+  message: string;
+  totalProcessed: number;
 }
 
-export interface UpdateAssetRequest{
-  id: number,
-  name: string,
-  status: string,
-  metadata: any,
+export interface UpdateAssetRequest {
+  id: number;
+  name: string;
+  status: string;
+  metadata: any;
 }
 
 export interface ApiResponse<T> {

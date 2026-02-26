@@ -2,6 +2,7 @@ import axios, {
   AxiosInstance,
   AxiosError,
   InternalAxiosRequestConfig,
+  AxiosRequestConfig,
 } from "axios";
 import Cookies from "js-cookie";
 
@@ -13,6 +14,21 @@ export type NormalizedError = {
   isNetworkError?: boolean;
   originalError?: any;
 };
+
+export interface TypedAxiosInstance {
+  get<T = any>(url: string, config?: AxiosRequestConfig): Promise<T>;
+  post<T = any>(
+    url: string,
+    data?: any,
+    config?: AxiosRequestConfig,
+  ): Promise<T>;
+  patch<T = any>(
+    url: string,
+    data?: any,
+    config?: AxiosRequestConfig,
+  ): Promise<T>;
+  delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<T>;
+}
 
 const TOKEN_COOKIE_NAME = "access_token";
 
@@ -28,7 +44,7 @@ export function setTokenCookie(
   const defaultOpts: Cookies.CookieAttributes = {
     expires: 7,
     path: "/",
-    secure: process.env.NODE_ENV === "development",
+    secure: process.env.NODE_ENV !== "development",
     sameSite: "none",
   };
   Cookies.set(TOKEN_COOKIE_NAME, token, { ...defaultOpts, ...options });
@@ -84,14 +100,14 @@ export function createApiClient(opts?: {
   baseURL?: string;
   withCredentials?: boolean;
   attachTokenFromCookie?: boolean;
-}): AxiosInstance {
+}): TypedAxiosInstance {
   const baseURL = opts?.baseURL ?? process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
   const withCredentials = opts?.withCredentials ?? true;
   const attachTokenFromCookie = opts?.attachTokenFromCookie ?? true;
 
   const instance = axios.create({
     baseURL,
-    withCredentials, // browser will send cookies for same-site/cross-site (depends on cookie attrs)
+    withCredentials,
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
@@ -105,9 +121,9 @@ export function createApiClient(opts?: {
         console.group(
           `🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`,
         );
-        console.log("Full URL:", (config.baseURL || "") + config.url);
-        console.log("Headers:", config.headers);
-        console.log("Data:", config.data);
+        console.debug("Full URL:", (config.baseURL || "") + config.url);
+        console.debug("Headers:", config.headers);
+        console.debug("Data:", config.data);
         console.groupEnd();
 
         if (attachTokenFromCookie) {
@@ -137,8 +153,8 @@ export function createApiClient(opts?: {
       console.group(
         `✅ API Response: ${response.config.method?.toUpperCase()} ${response.config.url}`,
       );
-      console.log("Status:", response.status);
-      console.log("Body:", response.data);
+      console.debug("Status:", response.status);
+      console.debug("Body:", response.data);
       console.groupEnd();
       return response.data;
     },
@@ -147,18 +163,17 @@ export function createApiClient(opts?: {
       console.group(
         `❌ API Error: ${error.config?.method?.toUpperCase()} ${error.config?.url}`,
       );
-      console.log("Status:", norm.status);
-      console.log("Message:", norm.message);
-      console.log("Data:", norm.data);
+      console.error("Status:", norm.status);
+      console.error("Message:", norm.message);
+      console.error("Data:", norm.data);
       console.groupEnd();
       return Promise.reject(norm);
     },
   );
 
-  return instance;
+  return instance as unknown as TypedAxiosInstance;
 }
 
-// Default client (convention)
 export const apiClient = createApiClient({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://localhost:7199/api",
   withCredentials: true,

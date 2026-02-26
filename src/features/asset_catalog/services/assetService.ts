@@ -11,6 +11,7 @@ import {
   CreateAssetRequest,
   UpdateAssetRequest,
   BulkImportAssetsResponse,
+  BulkImportRequest,
 } from "@/src/types/assetTypes";
 
 export async function getAssetCatalogService(
@@ -62,7 +63,7 @@ export async function updateAssetService(
 }
 
 export async function bulkImportAssetsService(
-  file: File,
+  file: BulkImportRequest,
 ): Promise<BulkImportAssetsResponse> {
   const response = await bulkImportAssets(file);
 
