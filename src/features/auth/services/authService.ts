@@ -7,8 +7,6 @@ import {
   User,
 } from "@/src/types/authTypes";
 
-import { clearTokenCookie } from "@/src/lib/api/client";
-
 export async function loginService(
   payload: LoginRequest,
 ): Promise<AuthResponse> {
@@ -44,9 +42,5 @@ export async function getMeService(): Promise<User> {
 }
 
 export async function logoutService(): Promise<void> {
-  try {
-    await logoutApi();
-  } finally {
-    clearTokenCookie();
-  }
+  await logoutApi();
 }

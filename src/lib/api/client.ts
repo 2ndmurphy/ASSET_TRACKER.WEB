@@ -4,7 +4,6 @@ import axios, {
   InternalAxiosRequestConfig,
   AxiosRequestConfig,
 } from "axios";
-import Cookies from "js-cookie";
 
 export type NormalizedError = {
   status?: number;
@@ -28,30 +27,6 @@ export interface TypedAxiosInstance {
     config?: AxiosRequestConfig,
   ): Promise<T>;
   delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<T>;
-}
-
-const TOKEN_COOKIE_NAME = "access_token";
-
-export function getTokenCookie(): string | undefined {
-  if (typeof window === "undefined") return undefined;
-  return Cookies.get(TOKEN_COOKIE_NAME);
-}
-
-export function setTokenCookie(
-  token: string,
-  options?: Cookies.CookieAttributes,
-) {
-  const defaultOpts: Cookies.CookieAttributes = {
-    expires: 7,
-    path: "/",
-    secure: process.env.NODE_ENV !== "development",
-    sameSite: "none",
-  };
-  Cookies.set(TOKEN_COOKIE_NAME, token, { ...defaultOpts, ...options });
-}
-
-export function clearTokenCookie() {
-  Cookies.remove(TOKEN_COOKIE_NAME, { path: "/" });
 }
 
 // Error normalizer
@@ -99,11 +74,9 @@ function normalizeAxiosError(err: AxiosError | any): NormalizedError {
 export function createApiClient(opts?: {
   baseURL?: string;
   withCredentials?: boolean;
-  attachTokenFromCookie?: boolean;
 }): TypedAxiosInstance {
   const baseURL = opts?.baseURL ?? process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
   const withCredentials = opts?.withCredentials ?? true;
-  const attachTokenFromCookie = opts?.attachTokenFromCookie ?? true;
 
   const instance = axios.create({
     baseURL,
@@ -126,14 +99,6 @@ export function createApiClient(opts?: {
         console.debug("Data:", config.data);
         console.groupEnd();
 
-        if (attachTokenFromCookie) {
-          const token = getTokenCookie();
-          if (token) {
-            if (!config.headers.has("Authorization")) {
-              config.headers.set("Authorization", `Bearer ${token}`);
-            }
-          }
-        }
         if (typeof config.withCredentials === "undefined") {
           config.withCredentials = withCredentials;
         }
@@ -151,12 +116,12 @@ export function createApiClient(opts?: {
   let isRefreshing = false;
   let failedQueue: any[] = [];
 
-  const processQueue = (error: any, token: string | null = null) => {
+  const processQueue = (error: any) => {
     failedQueue.forEach((prom) => {
       if (error) {
         prom.reject(error);
       } else {
-        prom.resolve(token);
+        prom.resolve();
       }
     });
     failedQueue = [];
@@ -183,8 +148,7 @@ export function createApiClient(opts?: {
           return new Promise((resolve, reject) => {
             failedQueue.push({ resolve, reject });
           })
-            .then((token) => {
-              originalRequest.headers.set("Authorization", `Bearer ${token}`);
+            .then(() => {
               return instance(originalRequest);
             })
             .catch((err) => {
@@ -200,24 +164,15 @@ export function createApiClient(opts?: {
           const { refreshToken } = await import("./auth");
           const response = await refreshToken();
 
-          if (response.success && response.token) {
-            setTokenCookie(response.token);
-            instance.defaults.headers.common["Authorization"] =
-              `Bearer ${response.token}`;
-            processQueue(null, response.token);
-
+          if (response.success) {
+            processQueue(null);
             // Retry the original request
-            originalRequest.headers.set(
-              "Authorization",
-              `Bearer ${response.token}`,
-            );
             return instance(originalRequest);
           } else {
             throw new Error("Refresh token invalid");
           }
         } catch (refreshError) {
-          processQueue(refreshError, null);
-          clearTokenCookie();
+          processQueue(refreshError);
           // Redirect to login if in browser and NOT already on a public route
           if (typeof window !== "undefined") {
             const currentPath = window.location.pathname;
@@ -251,7 +206,6 @@ export function createApiClient(opts?: {
 
 export const apiClient = createApiClient({
   baseURL:
-    process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://localhost:7199/api/web",
+    process.env.NEXT_PUBLIC_API_BASE_URL ?? " http://localhost:5282/api/web",
   withCredentials: true,
-  attachTokenFromCookie: true,
 });
