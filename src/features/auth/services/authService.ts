@@ -1,18 +1,16 @@
+import { loginApi, logoutApi, registerApi, getMeApi } from "@/src/lib/api/auth";
+
 import {
-  loginApi,
-  logoutApi,
   LoginRequest,
   AuthResponse,
   RegisterRequest,
-  registerApi,
   User,
-  getMeApi,
-} from "@/src/lib/api/auth";
+} from "@/src/types/authTypes";
 
 import { clearTokenCookie } from "@/src/lib/api/client";
 
 export async function loginService(
-  payload: LoginRequest
+  payload: LoginRequest,
 ): Promise<AuthResponse> {
   const response = await loginApi(payload);
 
@@ -24,7 +22,7 @@ export async function loginService(
 }
 
 export async function registerService(
-  payload: RegisterRequest
+  payload: RegisterRequest,
 ): Promise<AuthResponse> {
   const response = await registerApi(payload);
 

@@ -17,6 +17,7 @@ export interface User {
 export interface AuthResponse {
   success: boolean;
   message: string;
+  token?: string;
 }
 
 export interface MeResponse {

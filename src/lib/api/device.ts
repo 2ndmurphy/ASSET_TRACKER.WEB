@@ -35,10 +35,10 @@ export const deleteDevice = (deviceId: number) =>
   apiClient.delete<SingleDeviceResponse>(`/devices/${deviceId}/delete`);
 
 export const killSwitch = (targetId: KillOperationRequest) =>
-  apiClient.post<SingleDeviceResponse>(`/kill-device`, targetId);
+  apiClient.post<SingleDeviceResponse>(`/devices/kill-device`, targetId);
 
 export const killScan = (targetId: KillOperationRequest) =>
-  apiClient.post<SingleDeviceResponse>(`/kill-scan-task`, targetId);
+  apiClient.post<SingleDeviceResponse>(`/devices/kill-scan-task`, targetId);
 
 export const killUser = (targetId: KillOperationRequest) =>
-  apiClient.post<SingleDeviceResponse>(`/force-logout`, targetId);
+  apiClient.post<SingleDeviceResponse>(`/devices/force-logout`, targetId);

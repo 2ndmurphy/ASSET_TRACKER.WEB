@@ -184,7 +184,7 @@ export default function DeviceManagementPage() {
               onClick={async (e) => {
                 e.stopPropagation();
                 if (confirm("Kill scan session?")) {
-                  await killScan({ targetId: row.deviceId });
+                  await killScan({ targetId: row.scanSessionId });
                   refresh();
                 }
               }}
@@ -203,7 +203,7 @@ export default function DeviceManagementPage() {
               onClick={async (e) => {
                 e.stopPropagation();
                 if (confirm("Kill user session?")) {
-                  await killUser({ targetId: row.deviceId });
+                  await killUser({ targetId: row.userSessionId });
                   refresh();
                 }
               }}
@@ -248,7 +248,8 @@ export default function DeviceManagementPage() {
   );
 
   const totalCount = data?.data?.totalCount ?? 0;
-  const totalPages = Math.ceil(totalCount / (pageSize || 1));
+  const safePageSize = pageSize > 0 ? pageSize : 1;
+  const totalPages = Math.ceil(totalCount / safePageSize);
 
   return (
     <div className="space-y-6">

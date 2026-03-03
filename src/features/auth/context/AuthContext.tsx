@@ -1,7 +1,14 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
-import { User } from "@/src/lib/api/auth";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+  ReactNode,
+} from "react";
+import { User } from "@/src/types/authTypes";
 import { getMeService, logoutService } from "../services/authService";
 import { useRouter, usePathname } from "next/navigation";
 
@@ -25,19 +32,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isHydrated, setIsHydrated] = useState(false);
   const router = useRouter();
 
-  const fetchUser = useCallback(async (showLoading = true) => {
-    if (showLoading) setLoading(true);
-    try {
-      const userData = await getMeService();
-      setUser(userData);
-      sessionStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userData));
-    } catch (error) {
-      setUser(null);
-      sessionStorage.removeItem(USER_STORAGE_KEY);
-    } finally {
-      if (showLoading) setLoading(false);
-    }
-  }, []);
+  const fetchUser = useCallback(
+    async (showLoading = true) => {
+      if (showLoading) setLoading(true);
+      try {
+        const userData = await getMeService();
+        setUser(userData);
+        sessionStorage.setItem(USER_STORAGE_KEY, JSON.stringify(userData));
+
+        // After successful fetch, if we are on the login page, redirect to dashboard or callbackUrl
+        if (typeof window !== "undefined") {
+          const path = window.location.pathname;
+          if (
+            path === "/auth/login" ||
+            path === "/auth/register" ||
+            path === "/"
+          ) {
+            const params = new URLSearchParams(window.location.search);
+            const callbackUrl = params.get("callbackUrl");
+            router.push(
+              callbackUrl ? decodeURIComponent(callbackUrl) : "/dashboard",
+            );
+          }
+        }
+      } catch (error) {
+        setUser(null);
+        sessionStorage.removeItem(USER_STORAGE_KEY);
+      } finally {
+        if (showLoading) setLoading(false);
+      }
+    },
+    [router],
+  );
 
   useEffect(() => {
     // 1. Initial hydration from sessionStorage
@@ -64,7 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const login = async (data: any) => {
-    // Actual login is handled by the useAuth hook, 
+    // Actual login is handled by the useAuth hook,
     // but we refresh the user data here to sync global state.
     await fetchUser(true);
   };

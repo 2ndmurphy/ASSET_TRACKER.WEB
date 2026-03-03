@@ -148,6 +148,20 @@ export function createApiClient(opts?: {
     },
   );
 
+  let isRefreshing = false;
+  let failedQueue: any[] = [];
+
+  const processQueue = (error: any, token: string | null = null) => {
+    failedQueue.forEach((prom) => {
+      if (error) {
+        prom.reject(error);
+      } else {
+        prom.resolve(token);
+      }
+    });
+    failedQueue = [];
+  };
+
   instance.interceptors.response.use(
     (response) => {
       console.group(
@@ -158,8 +172,69 @@ export function createApiClient(opts?: {
       console.groupEnd();
       return response.data;
     },
-    (error) => {
+    async (error) => {
+      const originalRequest = error.config;
       const norm = normalizeAxiosError(error);
+
+      // Handle 401 Unauthorized errors
+      const isRefreshRequest = originalRequest.url?.includes("/auth/refresh");
+      if (norm.status === 401 && !originalRequest._retry && !isRefreshRequest) {
+        if (isRefreshing) {
+          return new Promise((resolve, reject) => {
+            failedQueue.push({ resolve, reject });
+          })
+            .then((token) => {
+              originalRequest.headers.set("Authorization", `Bearer ${token}`);
+              return instance(originalRequest);
+            })
+            .catch((err) => {
+              return Promise.reject(err);
+            });
+        }
+
+        originalRequest._retry = true;
+        isRefreshing = true;
+
+        try {
+          // Dynamic import to avoid circular dependency
+          const { refreshToken } = await import("./auth");
+          const response = await refreshToken();
+
+          if (response.success && response.token) {
+            setTokenCookie(response.token);
+            instance.defaults.headers.common["Authorization"] =
+              `Bearer ${response.token}`;
+            processQueue(null, response.token);
+
+            // Retry the original request
+            originalRequest.headers.set(
+              "Authorization",
+              `Bearer ${response.token}`,
+            );
+            return instance(originalRequest);
+          } else {
+            throw new Error("Refresh token invalid");
+          }
+        } catch (refreshError) {
+          processQueue(refreshError, null);
+          clearTokenCookie();
+          // Redirect to login if in browser and NOT already on a public route
+          if (typeof window !== "undefined") {
+            const currentPath = window.location.pathname;
+            const isPublicRoute =
+              currentPath.startsWith("/auth/login") ||
+              currentPath.startsWith("/auth/register");
+
+            if (!isPublicRoute) {
+              window.location.href = "/auth/login";
+            }
+          }
+          return Promise.reject(normalizeAxiosError(refreshError));
+        } finally {
+          isRefreshing = false;
+        }
+      }
+
       console.group(
         `❌ API Error: ${error.config?.method?.toUpperCase()} ${error.config?.url}`,
       );
@@ -175,7 +250,8 @@ export function createApiClient(opts?: {
 }
 
 export const apiClient = createApiClient({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://localhost:7199/api",
+  baseURL:
+    process.env.NEXT_PUBLIC_API_BASE_URL ?? "https://localhost:7199/api/web",
   withCredentials: true,
   attachTokenFromCookie: true,
 });

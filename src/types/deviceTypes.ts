@@ -7,7 +7,7 @@ export interface DeviceItem {
   currentOperator: string;
   loginTime: string;
   isUserLoggedIn: boolean;
-  scanSessionId: boolean;
+  scanSessionId: number;
   currentTask: string;
   taskStartTime: string;
 }
