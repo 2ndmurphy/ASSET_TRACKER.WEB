@@ -3,30 +3,29 @@ import {
   CreateLocationRequest,
   UpdateLocationRequest,
   LocationManagementResponse,
-  SingleLocationResponse
+  SingleLocationResponse,
 } from "../../types/locationTypes";
 
-export const getLocationManagement = async (pageNumber: number, pageSize: number, search?: string) => {
+export const getLocationManagement = async (
+  pageNumber: number,
+  pageSize: number,
+  search?: string,
+) => {
   const params = new URLSearchParams();
   if (pageNumber) params.append("page", pageNumber.toString());
   if (pageSize) params.append("pageSize", pageSize.toString());
   if (search) params.append("search", search);
 
-  const response = await apiClient.get<LocationManagementResponse>(`/locations?${params.toString()}`);
-  return response as unknown as LocationManagementResponse;
+  return apiClient.get<LocationManagementResponse>(
+    `/locations?${params.toString()}`,
+  );
 };
 
-export const getLocationById = async (id: number) => {
-  const response = await apiClient.get<SingleLocationResponse>(`/locations/${id}`);
-  return response as unknown as SingleLocationResponse;
-}
+export const getLocationById = async (id: number) =>
+  apiClient.get<SingleLocationResponse>(`/locations/${id}`);
 
-export const createLocation = async (location: CreateLocationRequest) => {
-  const response = await apiClient.post<SingleLocationResponse>(`/locations/new`, location);
-  return response as unknown as SingleLocationResponse;
-}
+export const createLocation = async (location: CreateLocationRequest) =>
+  apiClient.post<SingleLocationResponse>(`/locations/new`, location);
 
-export const updateLocation = async (location: UpdateLocationRequest) => {
-  const response = await apiClient.put<SingleLocationResponse>(`/locations/edit`, location);
-  return response as unknown as SingleLocationResponse;
-}
+export const updateLocation = async (location: UpdateLocationRequest) =>
+  apiClient.patch<SingleLocationResponse>(`/locations/edit`, location);

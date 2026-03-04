@@ -25,14 +25,19 @@ export interface TypedAxiosInstance {
     data?: any,
     config?: AxiosRequestConfig,
   ): Promise<T>;
+  put<T = any>(
+    url: string,
+    data?: any,
+    config?: AxiosRequestConfig,
+  ): Promise<T>;
   delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<T>;
 }
 
-// Error normalizer
+// Normalisasi Error
 function normalizeAxiosError(err: AxiosError | any): NormalizedError {
   if (axios.isAxiosError(err)) {
     if (err.response) {
-      // Server responded with a status code outside 2xx
+      // Response server status code diluar dari 2xx
       return {
         status: err.response.status,
         code:
@@ -69,7 +74,7 @@ function normalizeAxiosError(err: AxiosError | any): NormalizedError {
   };
 }
 
-// Factory for API client
+// Factory API client
 export function createApiClient(opts?: {
   baseURL?: string;
   withCredentials?: boolean;

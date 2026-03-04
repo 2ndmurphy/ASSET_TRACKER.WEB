@@ -30,6 +30,9 @@ export const createAsset = (asset: CreateAssetRequest) =>
 export const updateAsset = (asset: UpdateAssetRequest) =>
   apiClient.patch<SingleAssetResponse>(`/assets/edit`, asset);
 
+export const deleteAsset = (assetId: number) =>
+  apiClient.patch<SingleAssetResponse>(`/assets/${assetId}/delete`);
+
 export const bulkImportAssets = (assetFile: BulkImportRequest) => {
   const formData = new FormData();
   formData.append("file", assetFile.file);
