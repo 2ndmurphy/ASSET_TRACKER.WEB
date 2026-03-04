@@ -1,0 +1,179 @@
+name: 🚀 Staging Pipeline
+
+on:
+  push:
+    branches: [staging]
+
+# ====================================================
+# VARS (di Gitea → Repository → Settings → Variables)
+# ====================================================
+# - WA_ENDPOINT
+# - STAG_WA_TARGET
+# - IMAGE_NAME
+# - STAG_DEPLOY_URL
+# - STAG_DEPLOY_PORT
+# - STAG_NEXT_PUBLIC_API_BASE_URL
+# - STAG_NEXT_PUBLIC_MAINTENANCE_MODE
+# - STAG_NEXT_PUBLIC_RECAPTCHA_SITE_KEY
+# - STAG_RECAPTCHA_SECRET_KEY
+# ====================================================
+
+# ====================================================
+# SECRETS (di Gitea → Repository → Settings → Secrets)
+# ====================================================
+# - REGISTRY_URL
+# - REGISTRY_USERNAME
+# - REGISTRY_PASSWORD
+# - STAG_HOSTNAME
+# - STAG_USERNAME
+# - STAG_PASSWORD
+# ====================================================
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # ==================================================
+      # 🔔 Notify Build START with commit info
+      # ==================================================
+      - name: 🔔 WA Notify - Build Started
+        run: |
+          MSG=$(jq -n --arg branch "$GITHUB_REF_NAME" \
+            --arg target "${{ vars.STAG_WA_TARGET }}" \
+            --arg actor "$GITHUB_ACTOR" \
+            --arg msg "$(jq -r '.head_commit.message' $GITHUB_EVENT_PATH)" \
+            --arg repo "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
+            --arg deploy "${{ vars.STAG_DEPLOY_URL }}:${{ vars.STAG_DEPLOY_PORT }}" \
+            '{ target: $target, message: "🚀 Build Started (Staging)\n\n- Branch: \($branch)\n- Commit by: \($actor)\n- Repo URL: \($repo)\n- Deploy URL: \($deploy)\n- Message: \($msg)"}')
+
+          curl -X POST "${{ vars.WA_ENDPOINT }}" \
+             -H "Content-Type: application/json" \
+             -d "$MSG"
+
+      # ==================================================
+      # 😮‍💨 Docker Login
+      # ==================================================
+      - name: 😮‍💨 Login to Docker Registry
+        run: |
+          echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login "${{ secrets.REGISTRY_URL }}" \
+            -u "${{ secrets.REGISTRY_USERNAME }}" --password-stdin
+
+      # ==================================================
+      # 🔥 Build & Push Docker Image
+      # ==================================================
+      - name: 🔥 Build Docker Image
+        run: |
+          docker build \
+          --build-arg NEXT_PUBLIC_API_BASE_URL=${{ vars.STAG_NEXT_PUBLIC_API_BASE_URL }} \
+          --build-arg NEXT_PUBLIC_MAINTENANCE_MODE=${{ vars.STAG_NEXT_PUBLIC_MAINTENANCE_MODE }} \
+          --build-arg NEXT_PUBLIC_RECAPTCHA_SITE_KEY=${{ vars.STAG_NEXT_PUBLIC_RECAPTCHA_SITE_KEY }} \
+          --build-arg RECAPTCHA_SECRET_KEY=${{ vars.STAG_RECAPTCHA_SECRET_KEY }} \
+          -t ${{ secrets.REGISTRY_URL }}/${{ vars.IMAGE_NAME }}:stag-latest .
+
+      - name: Push Docker Image
+        run: |
+          docker push ${{ secrets.REGISTRY_URL }}/${{ vars.IMAGE_NAME }}:stag-latest
+
+      # ==================================================
+      # 🔔 WA Notify - Build Success
+      # ==================================================
+      - name: 🔔 WA Notify - Build Success
+        if: success()
+        run: |
+          MSG=$(jq -n --arg branch "$GITHUB_REF_NAME" \
+            --arg target "${{ vars.STAG_WA_TARGET }}" \
+            --arg actor "$GITHUB_ACTOR" \
+            --arg msg "$(jq -r '.head_commit.message' $GITHUB_EVENT_PATH)" \
+            --arg sha "$GITHUB_SHA" \
+            --arg repo "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
+            --arg deploy "${{ vars.STAG_DEPLOY_URL }}:${{ vars.STAG_DEPLOY_PORT }}" \
+            '{ target: $target, message: "✅ Build Success (Staging)\n\n- Branch: \($branch)\n- Commit by: \($actor)\n- Repo URL: \($repo)\n- Deploy URL: \($deploy)\n- Message: \($msg)"}')
+
+          curl -X POST "${{ vars.WA_ENDPOINT }}" \
+                -H "Content-Type: application/json" \
+                -d "$MSG"
+
+      # ==================================================
+      # 🔔 WA Notify - Build Failed
+      # ==================================================
+      - name: 🔔 WA Notify - Build Failed
+        if: failure()
+        run: |
+          MSG=$(jq -n --arg branch "$GITHUB_REF_NAME" \
+            --arg target "${{ vars.STAG_WA_TARGET }}" \
+            --arg actor "$GITHUB_ACTOR" \
+            --arg msg "$(jq -r '.head_commit.message' $GITHUB_EVENT_PATH)" \
+            --arg repo "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
+            --arg deploy "${{ vars.STAG_DEPLOY_URL }}:${{ vars.STAG_DEPLOY_PORT }}" \
+            '{ target: $target, message: "❌ Build Failed (Staging)\n\n- Branch: \($branch)\n- Commit by: \($actor)\n- Repo URL: \($repo)\n- Deploy URL: \($deploy)\n- Message: \($msg)"}')
+
+          curl -X POST "${{ vars.WA_ENDPOINT }}" \
+                -H "Content-Type: application/json" \
+                -d "$MSG"
+
+      # ==================================================
+      # 🆙 DEPLOY TO SERVER
+      # ==================================================
+      - name: 🆙 Deploy to Staging Server
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.STAG_HOSTNAME }}
+          port: ${{ secrets.STAG_PORT }}
+          username: ${{ secrets.STAG_USERNAME }}
+          password: ${{ secrets.STAG_PASSWORD }}
+          script: |
+            docker login ${{ secrets.REGISTRY_URL }} -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }}
+            docker pull ${{ secrets.REGISTRY_URL }}/${{ vars.IMAGE_NAME }}:stag-latest
+
+            if [ "$(docker ps -a -q -f name=${{ vars.IMAGE_NAME }}-stag)" ]; then
+              echo "Stopping existing container..."
+              docker stop ${{ vars.IMAGE_NAME }}-stag || true
+              echo "Removing existing container..."
+              docker rm -f ${{ vars.IMAGE_NAME }}-stag || true
+            fi
+
+            docker run -d --restart=always -v /mnt/10.10.0.223:/app/public/10.10.0.223 --name ${{ vars.IMAGE_NAME }}-stag -p ${{ vars.STAG_DEPLOY_PORT }}:3000 \
+            -e NEXT_PUBLIC_API_BASE_URL="${{ vars.STAG_NEXT_PUBLIC_API_BASE_URL }}" \
+            -e NEXT_PUBLIC_MAINTENANCE_MODE="${{ vars.STAG_NEXT_PUBLIC_MAINTENANCE_MODE }}" \
+            -e NEXT_PUBLIC_RECAPTCHA_SITE_KEY="${{ vars.STAG_NEXT_PUBLIC_RECAPTCHA_SITE_KEY }}" \
+            -e RECAPTCHA_SECRET_KEY="${{ vars.STAG_RECAPTCHA_SECRET_KEY }}" \
+            ${{ secrets.REGISTRY_URL }}/${{ vars.IMAGE_NAME }}:stag-latest
+
+      # ==================================================
+      # 🔔 WA Notify - Deploy Success
+      # ==================================================
+      - name: 🔔 WA Notify - Deploy Success
+        if: success()
+        run: |
+          MSG=$(jq -n --arg branch "$GITHUB_REF_NAME" \
+            --arg target "${{ vars.STAG_WA_TARGET }}" \
+            --arg actor "$GITHUB_ACTOR" \
+            --arg sha "$GITHUB_SHA" \
+            --arg repo "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
+            --arg deploy "${{ vars.STAG_DEPLOY_URL }}:${{ vars.STAG_DEPLOY_PORT }}" \
+            '{ target: $target, message: "✅ Deploy Success (Staging)\n\n- Branch: \($branch)\n- Commit by: \($actor)\n- Repo URL: \($repo)\n- Deploy URL: \($deploy)"}')
+
+          curl -X POST "${{ vars.WA_ENDPOINT }}" \
+            -H "Content-Type: application/json" \
+            -d "$MSG"
+
+      # ==================================================
+      # 🔔 DEPLOY FAILED
+      # ==================================================
+      - name: 🔔 WA Notify - Deploy Failed
+        if: failure()
+        run: |
+          MSG=$(jq -n --arg branch "$GITHUB_REF_NAME" \
+            --arg target "${{ vars.STAG_WA_TARGET }}" \
+            --arg actor "$GITHUB_ACTOR" \
+            --arg repo "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
+            --arg deploy "${{ vars.STAG_DEPLOY_URL }}:${{ vars.STAG_DEPLOY_PORT }}" \
+            '{ target: $target, message: "❌ Deploy Failed (Staging)\n\n- Branch: \($branch)\n- Commit by: \($actor)\n- Repo URL: \($repo)\n- Deploy URL: \($deploy)"}')
+
+          curl -X POST "${{ vars.WA_ENDPOINT }}" \
+            -H "Content-Type: application/json" \
+            -d "$MSG"

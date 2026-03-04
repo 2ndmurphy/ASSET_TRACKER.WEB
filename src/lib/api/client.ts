@@ -205,7 +205,6 @@ export function createApiClient(opts?: {
 }
 
 export const apiClient = createApiClient({
-  baseURL:
-    process.env.NEXT_PUBLIC_API_BASE_URL ?? " http://localhost:5282/api/web",
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
   withCredentials: true,
 });
