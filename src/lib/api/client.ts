@@ -1,5 +1,4 @@
 import axios, {
-  AxiosInstance,
   AxiosError,
   InternalAxiosRequestConfig,
   AxiosRequestConfig,
@@ -54,7 +53,7 @@ function normalizeAxiosError(err: AxiosError | any): NormalizedError {
     }
 
     if (err.request) {
-      // Request made but no response (network error / CORS / server down)
+      // Request dibuat tapi tidak ada response dari server
       return {
         message: "Network error — no response received from server",
         isNetworkError: true,
@@ -63,7 +62,7 @@ function normalizeAxiosError(err: AxiosError | any): NormalizedError {
     }
   }
 
-  // Non-Axios error or unknown
+  // Unknown error
   return {
     message: err?.message ?? "Unknown error",
     originalError: err,
