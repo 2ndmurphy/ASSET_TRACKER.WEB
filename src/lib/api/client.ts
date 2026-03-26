@@ -42,12 +42,12 @@ function normalizeAxiosError(err: AxiosError | any): NormalizedError {
         status: err.response.status,
         code:
           (err.response.data &&
-            (err.response.data.code ?? err.response.data.error.code)) ??
+            (err.response.data.code ?? err.response.data.error?.code)) ??
           err.code ??
           null,
         message:
           (err.response.data &&
-            (err.response.data.message ?? err.response.data.error.message)) ??
+            (err.response.data.message ?? err.response.data.error?.message)) ??
           err.message ??
           "Request failed",
         data: err.response.data,
@@ -145,7 +145,7 @@ export function createApiClient(opts?: {
       const norm = normalizeAxiosError(error);
 
       // Handle 401 Unauthorized errors
-      const isRefreshRequest = originalRequest.url?.includes("/auth/refresh");
+      const isRefreshRequest = originalRequest?.url?.includes("/auth/refresh");
       if (norm.status === 401 && !originalRequest._retry && !isRefreshRequest) {
         if (isRefreshing) {
           return new Promise((resolve, reject) => {
@@ -166,6 +166,7 @@ export function createApiClient(opts?: {
           // Dynamic import to avoid circular dependency
           const { refreshToken } = await import("./auth");
           const response = await refreshToken();
+          console.log("🔄 Refresh response:", response);
 
           if (response.success) {
             processQueue(null);
