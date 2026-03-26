@@ -5,7 +5,7 @@ import { useLocation } from "@/src/features/location_management/hooks/useLocatio
 import { useCreateLocation } from "@/src/features/location_management/hooks/useCreateLocation";
 import { useUpdateLocation } from "@/src/features/location_management/hooks/useUpdateLocation";
 import DataTable, { ColumnDef } from "@/src/components/ui/DataTable";
-import ActionFormSidebar from "@/src/components/ui/ActionFormSidebar";
+import ActionFormSidebar from "@/src/components/forms/ActionFormSidebar";
 import LocationFormFields from "@/src/features/location_management/components/LocationFormFields";
 import Pagination from "@/src/components/ui/Pagination";
 import {

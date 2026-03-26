@@ -58,10 +58,14 @@ export default function AssetImportSidebar({
       "application/vnd.ms-excel",
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     ];
+
+    const fileName = file.name.toLowerCase();
+
     return (
       validTypes.includes(file.type) ||
-      file.name.endsWith(".csv") ||
-      file.name.endsWith(".xlsx")
+      fileName.endsWith(".csv") ||
+      fileName.endsWith(".xlsx") ||
+      fileName.endsWith(".xls")
     );
   };
 

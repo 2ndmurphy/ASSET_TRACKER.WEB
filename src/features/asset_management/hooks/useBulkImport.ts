@@ -12,7 +12,7 @@ export function useBulkImport(file: File) {
     setLoading(true);
     setError(null);
     try {
-      const response = await bulkImportAssetsService(file);
+      const response = await bulkImportAssetsService({ file });
       setData(response);
     } catch (error) {
       setError(error as NormalizedError);

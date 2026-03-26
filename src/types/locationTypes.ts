@@ -1,29 +1,28 @@
 export interface LocationItem {
-  id: number,
-  locationCode: string,
-  locationName: string,
-  locationDescription: string,
-  lastUpdatedAt: string
+  id: number;
+  locationCode: string;
+  locationName: string;
+  locationDescription: string;
+  lastUpdatedAt: string;
 }
 
 export interface CreateLocationRequest {
-  locationCode: string,
-  locationName: string,
-  locationDescription: string,
+  locationCode: string;
+  locationName: string;
+  locationDescription: string;
 }
 
-export interface UpdateLocationRequest{
-  id: number,
-  locationName: string,
-  locationCode: string,
-  locationDescription: string,
+export interface UpdateLocationRequest {
+  id: number;
+  locationName: string;
+  locationCode: string;
+  locationDescription: string;
 }
 
 export interface ApiResponse<T> {
   success: boolean;
-  message: string;
   data: T;
-  errorType: number;
+  message: string;
 }
 
 export interface LocationManagementData {

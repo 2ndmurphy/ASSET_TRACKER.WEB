@@ -1,7 +1,7 @@
-// components/ui/ActionFormSidebar.tsx
 "use client";
+
 import React from "react";
-import GenericSidebar from "./GenericSidebar";
+import GenericSidebar from "../ui/GenericSidebar";
 import { Save, Loader2 } from "lucide-react";
 
 interface ActionFormSidebarProps {

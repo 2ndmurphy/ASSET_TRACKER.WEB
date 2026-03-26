@@ -1,14 +1,14 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { useAssetCatalog } from "@/src/features/asset_catalog/hooks/useAssetCatalog";
-import { useCreateAsset } from "@/src/features/asset_catalog/hooks/useCreateAsset";
-import { useUpdateAsset } from "@/src/features/asset_catalog/hooks/useUpdateAsset";
+import { useAssets } from "@/src/features/asset_management/hooks/useAssets";
+import { useCreateAsset } from "@/src/features/asset_management/hooks/useCreateAsset";
+import { useUpdateAsset } from "@/src/features/asset_management/hooks/useUpdateAsset";
 import DataTable, { ColumnDef } from "@/src/components/ui/DataTable";
-import ActionFormSidebar from "@/src/components/ui/ActionFormSidebar";
-import AssetFormFields from "@/src/features/asset_catalog/components/AssetFormFields";
+import ActionFormSidebar from "@/src/components/forms/ActionFormSidebar";
+import AssetFormFields from "@/src/features/asset_management/components/AssetFormFields";
 import Pagination from "@/src/components/ui/Pagination";
-import AssetImportSidebar from "@/src/features/asset_catalog/components/AssetImportSidebar";
+import AssetImportSidebar from "@/src/features/asset_management/components/AssetImportSidebar";
 import {
   Search,
   Plus,
@@ -49,9 +49,7 @@ export default function AssetManagementPage() {
     description: "",
     lifecycleStatus: "Active",
   });
-  const [file, setFile] = useState<File | null>(null);
-
-  const { data, loading, error, refresh } = useAssetCatalog(
+  const { data, loading, error, refresh } = useAssets(
     page,
     pageSize,
     searchTerm,
@@ -219,7 +217,7 @@ export default function AssetManagementPage() {
         <div>
           <h2 className="text-2xl font-bold text-white flex items-center gap-2">
             <Package className="text-blue-500" />
-            Asset Catalog
+            Asset Management
           </h2>
           <p className="text-slate-400 text-sm">
             Manage and track your organization&apos;s assets in real-time.
@@ -352,7 +350,6 @@ export default function AssetManagementPage() {
         onClose={() => setIsImportSidebarOpen(false)}
         onSuccess={() => {
           refresh();
-          // Optional: Add a brief delay or message then close
           setTimeout(() => setIsImportSidebarOpen(false), 2000);
         }}
       />

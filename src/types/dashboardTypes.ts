@@ -29,6 +29,6 @@ export interface DashboardOverviewData {
 
 export interface DashboardOverviewResponse {
   success: boolean;
-  message: string;
   data: DashboardOverviewData;
+  message: string;
 }

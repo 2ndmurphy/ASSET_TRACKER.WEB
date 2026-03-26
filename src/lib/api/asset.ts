@@ -40,5 +40,10 @@ export const bulkImportAssets = (assetFile: BulkImportRequest) => {
   return apiClient.post<BulkImportAssetsResponse>(
     `/assets/bulk-import`,
     formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    },
   );
 };

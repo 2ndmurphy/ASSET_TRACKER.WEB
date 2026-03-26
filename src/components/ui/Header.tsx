@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { Search, Bell, User } from "lucide-react";
 import { useAuthContext } from "@/src/features/auth/context/AuthContext";
 

@@ -42,13 +42,12 @@ function normalizeAxiosError(err: AxiosError | any): NormalizedError {
         status: err.response.status,
         code:
           (err.response.data &&
-            (err.response.data.code ?? err.response.data.error)) ??
+            (err.response.data.code ?? err.response.data.error.code)) ??
           err.code ??
           null,
         message:
           (err.response.data &&
-            (err.response.data.message ??
-              err.response.data.error_description)) ??
+            (err.response.data.message ?? err.response.data.error.message)) ??
           err.message ??
           "Request failed",
         data: err.response.data,

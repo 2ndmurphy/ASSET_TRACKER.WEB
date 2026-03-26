@@ -2,8 +2,9 @@ import { useState, useEffect, useCallback } from "react";
 import { getAssetCatalogService } from "../services/assetService";
 import { AssetCatalogResponse } from "@/src/types/assetTypes";
 import { NormalizedError } from "@/src/lib/api/client";
+import { useDebounce } from "@/src/hooks/useDebounce";
 
-export function useAssetCatalog(
+export function useAssets(
   pageNumber: number,
   pageSize: number,
   search?: string,
@@ -12,7 +13,9 @@ export function useAssetCatalog(
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<NormalizedError | null>(null);
 
-  const fetchAssetCatalog = useCallback(async () => {
+  const debouncedSearchTerm = useDebounce(search, 300);
+
+  const fetchAssets = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -27,16 +30,16 @@ export function useAssetCatalog(
     } finally {
       setLoading(false);
     }
-  }, [pageNumber, pageSize, search]);
+  }, [pageNumber, pageSize, debouncedSearchTerm]);
 
   useEffect(() => {
-    fetchAssetCatalog();
-  }, [fetchAssetCatalog]);
+    fetchAssets();
+  }, [fetchAssets]);
 
   return {
     data,
     loading,
     error,
-    refresh: fetchAssetCatalog,
+    refresh: fetchAssets,
   };
 }

@@ -1,10 +1,12 @@
-// components/skeletons/StatCardSkeleton.tsx
 "use client";
+
 import React from "react";
 
 export function StatCardSkeleton({ className = "" }: { className?: string }) {
   return (
-    <div className={`p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl ${className}`}>
+    <div
+      className={`p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl ${className}`}
+    >
       <div className="flex items-center justify-between mb-4">
         <div className="p-3 rounded-xl bg-white/10 w-12 h-12 animate-pulse" />
         <div className="w-12 h-6 rounded-full bg-white/10 animate-pulse" />
@@ -38,7 +40,7 @@ export function AssetDistributionSkeleton({ rows = 5 }: { rows?: number }) {
               {/* varying pseudo-width to feel more natural */}
               <div
                 className="h-full bg-linear-to-r from-blue-600 to-indigo-600 transition-all duration-1000 animate-pulse"
-                style={{ width: `${30 + (i * 10) % 60}%` }}
+                style={{ width: `${30 + ((i * 10) % 60)}%` }}
               />
             </div>
           </div>

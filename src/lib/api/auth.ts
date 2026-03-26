@@ -6,22 +6,18 @@ import {
   MeResponse,
 } from "@/src/types/authTypes";
 
-export function registerApi(payload: RegisterRequest): Promise<AuthResponse> {
-  return apiClient.post("/auth/register", payload);
-}
+export const registerApi = async (
+  payload: RegisterRequest,
+): Promise<AuthResponse> =>
+  apiClient.post<AuthResponse>("/auth/register", payload);
 
-export function loginApi(payload: LoginRequest): Promise<AuthResponse> {
-  return apiClient.post("/auth/login", payload);
-}
+export const loginApi = async (payload: LoginRequest): Promise<AuthResponse> =>
+  apiClient.post<AuthResponse>("/auth/login", payload);
 
-export function refreshToken(): Promise<AuthResponse> {
-  return apiClient.post("/auth/refresh");
-}
+export const refreshToken = async (): Promise<AuthResponse> =>
+  apiClient.post<AuthResponse>("/auth/refresh");
 
-export function logoutApi() {
-  return apiClient.post("/auth/logout");
-}
+export const logoutApi = async () => apiClient.post("/auth/logout");
 
-export function getMeApi(): Promise<MeResponse> {
-  return apiClient.get("/auth/me");
-}
+export const getMeApi = async (): Promise<MeResponse> =>
+  apiClient.get<MeResponse>("/auth/me");

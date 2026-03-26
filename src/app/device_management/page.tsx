@@ -10,7 +10,7 @@ import { useKillScan } from "@/src/features/device_management/hooks/useKillScan"
 import { DeviceItem } from "@/src/types/deviceTypes";
 import DataTable, { ColumnDef } from "@/src/components/ui/DataTable";
 import Pagination from "@/src/components/ui/Pagination";
-import ActionFormSidebar from "@/src/components/ui/ActionFormSidebar";
+import ActionFormSidebar from "@/src/components/forms/ActionFormSidebar";
 import DeviceFormFields from "@/src/features/device_management/components/DeviceFormFields";
 import {
   Search,

@@ -15,7 +15,7 @@ export function useBulkImportAssets() {
     setError(null);
     setResult(null);
     try {
-      const response = await bulkImportAssetsService(file);
+      const response = await bulkImportAssetsService({ file });
       setResult(response.data);
       return response.data;
     } catch (err) {

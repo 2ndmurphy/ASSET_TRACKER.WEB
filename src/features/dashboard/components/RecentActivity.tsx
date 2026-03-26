@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Activity, History } from "lucide-react";
+import { diffForHumans } from "@/src/lib/utils/diffForHumans";
 
 export type ActivityItem = {
   assetName: string;
@@ -16,11 +17,17 @@ type Props = {
   className?: string;
 };
 
-function RecentActivityComponent({ activities, maxItems, className = "" }: Props) {
+function RecentActivityComponent({
+  activities,
+  maxItems,
+  className = "",
+}: Props) {
   const list = maxItems ? activities.slice(0, maxItems) : activities;
 
   return (
-    <div className={`bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 overflow-hidden min-w-0 ${className}`}>
+    <div
+      className={`bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 overflow-hidden min-w-0 ${className}`}
+    >
       <h3 className="text-lg font-semibold text-white mb-6 flex items-center gap-2">
         <Activity size={20} className="text-purple-400" />
         Recent Activity
@@ -37,12 +44,14 @@ function RecentActivityComponent({ activities, maxItems, className = "" }: Props
               </div>
 
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-white truncate">{activity.assetName}</p>
+                <p className="text-sm font-semibold text-white truncate">
+                  {activity.assetName}
+                </p>
                 <p className="text-xs text-slate-400 mt-0.5 truncate">
                   {activity.activityType} • {activity.location}
                 </p>
                 <p className="text-[10px] text-slate-500 mt-1 uppercase tracking-wider">
-                  {new Date(activity.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                  {diffForHumans(activity.timestamp)}
                 </p>
               </div>
             </div>

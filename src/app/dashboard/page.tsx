@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import StatCard from "@/src/features/dashboard/components/StatCard";
 import { Package, Van, AlertCircle } from "lucide-react";
 import { useDashboard } from "@/src/features/dashboard/hooks/useDashboard";
