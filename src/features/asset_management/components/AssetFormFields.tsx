@@ -19,20 +19,6 @@ export default function AssetFormFields({
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <label className="text-sm font-medium text-slate-300">Asset Name</label>
-        <input
-          required
-          type="text"
-          placeholder="e.g. Forklift XP-200"
-          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
-          value={formData.assetName || ""}
-          onChange={(e) =>
-            setFormData({ ...formData, assetName: e.target.value })
-          }
-        />
-      </div>
-
-      <div className="space-y-2">
         <label className="text-sm font-medium text-slate-300">Asset Code</label>
         <input
           required
@@ -51,6 +37,20 @@ export default function AssetFormFields({
             Unique identifier for this asset.
           </p>
         )}
+      </div>
+
+      <div className="space-y-2">
+        <label className="text-sm font-medium text-slate-300">Asset Name</label>
+        <input
+          required
+          type="text"
+          placeholder="e.g. Forklift XP-200"
+          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+          value={formData.assetName || ""}
+          onChange={(e) =>
+            setFormData({ ...formData, assetName: e.target.value })
+          }
+        />
       </div>
 
       <div className="space-y-2">

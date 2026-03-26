@@ -5,7 +5,7 @@ import { DeviceItem, UpdateDeviceRequest } from "@/src/types/deviceTypes";
 
 export function useUpdateDevice() {
   const [data, setData] = useState<DeviceItem | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<NormalizedError | null>(null);
 
   const updateDevice = useCallback(async (params: UpdateDeviceRequest) => {
