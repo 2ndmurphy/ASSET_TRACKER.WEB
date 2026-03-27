@@ -1,37 +1,62 @@
 "use client";
 
-import React, { useState, useMemo, useRef } from "react";
-import { useStocktakeHistories } from "@/src/features/audit_&_reporting/hooks/useStocktakeHistories";
+import React, { useState, useMemo } from "react";
+import { useStocktakeDetails } from "../hooks/useStocktakeDetails";
 import DataTable, { ColumnDef } from "@/src/components/ui/DataTable";
+import ActionFormSidebar from "@/src/components/forms/ActionFormSidebar";
 import Pagination from "@/src/components/ui/Pagination";
 import {
   Search,
+  Plus,
+  Package,
   RefreshCw,
-  Eye,
-  MapPin,
   SlidersHorizontal,
+  File,
+  Eye,
+  Edit2,
+  MapPin,
+  Clock,
   Trash,
-  ArrowLeft,
-  ChevronDown,
 } from "lucide-react";
+import { StocktakeDetailItem } from "@/src/types/auditTypes";
 import { diffForHumans } from "@/src/lib/utils/diffForHumans";
-import StocktakeDetails from "@/src/features/audit_&_reporting/components/StocktakeDetails";
 
-export default function AuditReportingPage() {
+function getStatusStyles(status: string) {
+  switch (status) {
+    case "Found":
+      return "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+    case "Missing (Strict)":
+      return "bg-rose-500/10 text-rose-400 border-rose-500/20";
+    case "Missing (Recently Moved)":
+      return "bg-rose-500/10 text-rose-400 border-rose-500/20";
+    case "Misplaced":
+      return "bg-amber-500/10 text-amber-400 border-amber-500/20";
+    case "Unexpected":
+      return "bg-blue-500/10 text-blue-400 border-blue-500/20";
+    default:
+      return "bg-slate-500/10 text-slate-400 border-slate-500/20";
+  }
+}
+
+export default function StocktakeDetails({
+  stocktakeId,
+}: {
+  stocktakeId: number;
+}) {
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isImportSidebarOpen, setIsImportSidebarOpen] = useState(false);
-  const [selectedStocktakeId, setSelectedStocktakeId] = useState<number | null>(
+  const [editingAsset, setEditingAsset] = useState<StocktakeDetailItem | null>(
     null,
   );
-  const { data, loading, error, refresh } = useStocktakeHistories(
+  const { data, loading, error, refresh } = useStocktakeDetails(
+    stocktakeId,
     page,
     pageSize,
     searchTerm,
   );
-  const detailsRef = useRef<HTMLDivElement>(null);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,104 +64,68 @@ export default function AuditReportingPage() {
     refresh();
   };
 
-  const handleView = (stocktakeId: number) => {
-    setSelectedStocktakeId(stocktakeId);
-    // Scroll to details after render
-    setTimeout(() => {
-      detailsRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }, 100);
+  const handleEditClick = (stocktake: StocktakeDetailItem) => {
+    setEditingAsset(stocktake);
+    setIsSidebarOpen(true);
   };
 
-  const handleCloseDetails = () => {
-    setSelectedStocktakeId(null);
+  const handleViewLifecycle = (epc: string) => {
+    // TODO: Implement view logic or navigation
+    console.log("View Asset Lifecycles", epc);
   };
 
   // Dynamic Columns
   const columns = useMemo<ColumnDef<any>[]>(
     () => [
       {
-        id: "auditDate",
-        header: "Audit Date",
+        id: "epc",
+        header: "EPC / Tag",
+        cell: (row) => (
+          <span className="text-xs text-slate-400 font-mono bg-white/5 px-2 py-1 rounded border border-white/5">
+            {row.epc || "Unassigned"}
+          </span>
+        ),
+      },
+      {
+        id: "assetName",
+        header: "Asset Name",
         cell: (row) => (
           <div className="flex flex-col">
-            <span className="text-sm text-slate-500 font-mono mt-0.5">
-              {diffForHumans(row.auditDate)}
+            <span className="text-sm font-medium text-white">
+              {row.assetName}
             </span>
           </div>
         ),
       },
       {
-        id: "location",
-        header: "Location",
-        accessor: "locationName",
+        id: "assetCode",
+        header: "Asset Code",
         cell: (row) => (
-          <div className="flex items-center gap-2 text-slate-400 text-sm">
-            <MapPin size={14} className="text-blue-400" />
-            <span>{row.locationName}</span>
+          <div className="flex flex-col">
+            <span className="text-sm font-medium text-white">
+              {row.assetCode}
+            </span>
           </div>
         ),
       },
       {
-        id: "performedBy",
-        header: "Performed By",
-        accessor: "performedBy",
+        id: "status",
+        header: "Status",
         cell: (row) => (
-          <span className="text-xs text-slate-400 font-mono bg-white/5 px-2 py-1 rounded border border-white/5">
-            {row.performedBy}
+          <span
+            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-medium border ${getStatusStyles(row.status)}`}
+          >
+            {row.status}
           </span>
         ),
       },
       {
-        id: "expected",
-        header: "Expected",
-        accessor: "expected",
+        id: "note",
+        header: "Note",
         cell: (row) => (
-          <span className="text-xs text-blue-400 font-mono bg-blue-500/5 px-2 py-1 rounded border border-blue-500/5">
-            {row.expected}
-          </span>
-        ),
-      },
-      {
-        id: "found",
-        header: "Found",
-        accessor: "found",
-        cell: (row) => (
-          <span className="text-xs text-green-400 font-mono bg-green-500/5 px-2 py-1 rounded border border-green-500/5">
-            {row.found}
-          </span>
-        ),
-      },
-      {
-        id: "missing",
-        header: "Missing",
-        accessor: "missing",
-        cell: (row) => (
-          <span className="text-xs text-red-400 font-mono bg-red-500/5 px-2 py-1 rounded border border-red-500/5">
-            {row.missing}
-          </span>
-        ),
-      },
-      {
-        id: "misplaced",
-        header: "Misplaced",
-        accessor: "misplaced",
-        cell: (row) => (
-          <span className="text-xs text-yellow-400 font-mono bg-yellow-500/5 px-2 py-1 rounded border border-yellow-500/5">
-            {row.misplaced}
-          </span>
-        ),
-      },
-      {
-        id: "unexpected",
-        header: "Unexpected",
-        accessor: "unexpected",
-        cell: (row) => (
-          <span className="text-xs text-slate-400 font-mono bg-white/5 px-2 py-1 rounded border border-white/5">
-            {row.unexpected}
-          </span>
+          <div className="flex items-center gap-2 text-slate-400 text-sm">
+            <span>{row.note || "Not added yet"}</span>
+          </div>
         ),
       },
       {
@@ -148,23 +137,12 @@ export default function AuditReportingPage() {
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                handleView(row.stocktakeId);
-              }}
-              className="p-2 hover:bg-blue-500/20 hover:text-blue-400 text-slate-400 rounded-lg transition-colors"
-              title="View Stocktake Details"
-            >
-              <Eye size={16} />
-            </button>
-
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleView(row.stocktakeId);
+                handleViewLifecycle(row.epc);
               }}
               className="p-2 hover:bg-rose-500/20 hover:text-rose-400 text-slate-400 rounded-lg transition-colors"
-              title="Delete Stocktake"
+              title="View Asset Lifecycles"
             >
-              <Trash size={16} />
+              <Eye size={16} />
             </button>
           </div>
         ),
@@ -182,14 +160,38 @@ export default function AuditReportingPage() {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-            {/* <Package className="text-blue-500" /> */}
-            Audit & Reporting
+          <h2 className="text-xl font-bold text-white flex items-center gap-2">
+            <Package className="text-blue-500" />
+            Stocktake Details
           </h2>
           <p className="text-slate-400 text-sm">
-            Manage and track your organization&apos;s assets in real-time.
+            Manage and track your stocktake details in real-time.
           </p>
         </div>
+
+        {/* <div className="flex items-center justify-self-center gap-4">
+          <button
+            onClick={() => setIsImportSidebarOpen(true)}
+            className="bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-xl font-medium transition-all shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2 group active:scale-95"
+          >
+            <File
+              size={20}
+              className="group-hover:rotate-90 transition-transform duration-300"
+            />
+            Bulk Import File
+          </button>
+
+          <button
+            onClick={handleAddClick}
+            className="bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-xl font-medium transition-all shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2 group active:scale-95"
+          >
+            <Plus
+              size={20}
+              className="group-hover:rotate-90 transition-transform duration-300"
+            />
+            Add New Asset
+          </button>
+        </div> */}
       </div>
 
       {/* Filters & Search Section */}
@@ -252,8 +254,8 @@ export default function AuditReportingPage() {
             <DataTable
               data={data.data.items}
               columns={columns}
-              rowKey={(row) => row.stocktakeId}
-              onRowClick={(row) => handleView(row.stocktakeId)}
+              rowKey={(row) => row.epc}
+              onRowClick={(row) => handleViewLifecycle(row.epc)}
             />
 
             <Pagination
@@ -267,28 +269,36 @@ export default function AuditReportingPage() {
         )
       )}
 
-      {/* Stocktake Details Section */}
-      {selectedStocktakeId !== null && (
-        <div
-          ref={detailsRef}
-          className="mt-2 animate-in fade-in slide-in-from-bottom-4 duration-300"
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <button
-              onClick={handleCloseDetails}
-              className="flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-slate-400 hover:bg-white/10 hover:text-white transition-colors text-sm"
-            >
-              <ArrowLeft size={16} />
-              Back to List
-            </button>
-            <div className="h-px flex-1 bg-white/10" />
-            <span className="text-xs text-slate-500 font-medium">
-              Stocktake #{selectedStocktakeId}
-            </span>
-          </div>
-          <StocktakeDetails stocktakeId={selectedStocktakeId} />
-        </div>
-      )}
+      {/* Generic Action Form Sidebar */}
+      <ActionFormSidebar
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+        title={editingAsset ? "Edit Asset" : "Add New Asset"}
+        subtitle={
+          editingAsset
+            ? `Updating ${editingAsset.assetCode}`
+            : "Fill in the details to create a new asset."
+        }
+        onSave={() => {}}
+        isSaving={false}
+        submitLabel={editingAsset ? "Update Asset" : "Save Asset"}
+      >
+        {/* <AssetFormFields
+                formData={formData}
+                setFormData={setFormData}
+                isEdit={!!editingAsset}
+              /> */}
+        <div>test</div>
+      </ActionFormSidebar>
+
+      {/* <AssetImportSidebar
+              isOpen={isImportSidebarOpen}
+              onClose={() => setIsImportSidebarOpen(false)}
+              onSuccess={() => {
+                refresh();
+                setTimeout(() => setIsImportSidebarOpen(false), 2000);
+              }}
+            /> */}
     </div>
   );
 }

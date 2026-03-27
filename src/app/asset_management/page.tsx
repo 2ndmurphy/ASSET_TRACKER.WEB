@@ -20,8 +20,10 @@ import {
   Edit2,
   MapPin,
   Clock,
+  Trash,
 } from "lucide-react";
 import { AssetItem } from "@/src/types/assetTypes";
+import { diffForHumans } from "@/src/lib/utils/diffForHumans";
 
 function getStatusStyles(status: string) {
   switch (status.toLowerCase()) {
@@ -85,7 +87,33 @@ export default function AssetManagementPage() {
     console.log("View asset", id);
   };
 
-  const columns = useMemo<ColumnDef<AssetItem>[]>(
+  const handleSave = async () => {
+    try {
+      if (editingAsset) {
+        await updateAsset({
+          id: editingAsset.id,
+          name: formData.assetCode || "",
+          status: formData.lifecycleStatus || "Active",
+          metadata: null,
+        });
+      } else {
+        await createAsset({
+          assetCode: formData.assetCode || "",
+          name: formData.assetName || "",
+          description: formData.description || "",
+          metadata: null,
+        });
+      }
+
+      setIsSidebarOpen(false);
+      refresh();
+    } catch (err) {
+      console.error("Save operation failed in component:", err);
+    }
+  };
+
+  // Dynamic Columns
+  const columns = useMemo<ColumnDef<any>[]>(
     () => [
       {
         id: "asset",
@@ -139,12 +167,7 @@ export default function AssetManagementPage() {
         cell: (row) => (
           <div className="flex items-center gap-2 text-slate-400 text-xs">
             <Clock size={14} />
-            <span>
-              {new Date(row.lastSeenAt).toLocaleString([], {
-                dateStyle: "short",
-                timeStyle: "short",
-              })}
-            </span>
+            <span>{diffForHumans(row.lastSeenAt)}</span>
           </div>
         ),
       },
@@ -174,37 +197,22 @@ export default function AssetManagementPage() {
             >
               <Edit2 size={16} />
             </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleView(row.stocktakeId);
+              }}
+              className="p-2 hover:bg-rose-500/20 hover:text-rose-400 text-slate-400 rounded-lg transition-colors"
+              title="Delete Stocktake"
+            >
+              <Trash size={16} />
+            </button>
           </div>
         ),
       },
     ],
     [],
   );
-
-  const handleSave = async () => {
-    try {
-      if (editingAsset) {
-        await updateAsset({
-          id: editingAsset.id,
-          name: formData.assetCode || "",
-          status: formData.lifecycleStatus || "Active",
-          metadata: null,
-        });
-      } else {
-        await createAsset({
-          assetCode: formData.assetCode || "",
-          name: formData.assetName || "",
-          description: formData.description || "",
-          metadata: null,
-        });
-      }
-
-      setIsSidebarOpen(false);
-      refresh();
-    } catch (err) {
-      console.error("Save operation failed in component:", err);
-    }
-  };
 
   const totalCount = data?.data?.totalCount ?? 0;
   const safePageSize = pageSize > 0 ? pageSize : 1;
