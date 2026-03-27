@@ -7,19 +7,13 @@ import ActionFormSidebar from "@/src/components/forms/ActionFormSidebar";
 import Pagination from "@/src/components/ui/Pagination";
 import {
   Search,
-  Plus,
   Package,
   RefreshCw,
   SlidersHorizontal,
-  File,
   Eye,
-  Edit2,
-  MapPin,
-  Clock,
-  Trash,
 } from "lucide-react";
 import { StocktakeDetailItem } from "@/src/types/auditTypes";
-import { diffForHumans } from "@/src/lib/utils/diffForHumans";
+import AssetLifecycleTimelines from "./AssetLifecycleTimelines";
 
 function getStatusStyles(status: string) {
   switch (status) {
@@ -48,7 +42,7 @@ export default function StocktakeDetails({
   const [searchTerm, setSearchTerm] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isImportSidebarOpen, setIsImportSidebarOpen] = useState(false);
-  const [editingAsset, setEditingAsset] = useState<StocktakeDetailItem | null>(
+  const [viewingAsset, setViewingAsset] = useState<StocktakeDetailItem | null>(
     null,
   );
   const { data, loading, error, refresh } = useStocktakeDetails(
@@ -64,21 +58,16 @@ export default function StocktakeDetails({
     refresh();
   };
 
-  const handleEditClick = (stocktake: StocktakeDetailItem) => {
-    setEditingAsset(stocktake);
+  const handleViewLifecycle = (asset: StocktakeDetailItem) => {
+    setViewingAsset(asset);
     setIsSidebarOpen(true);
-  };
-
-  const handleViewLifecycle = (epc: string) => {
-    // TODO: Implement view logic or navigation
-    console.log("View Asset Lifecycles", epc);
   };
 
   // Dynamic Columns
   const columns = useMemo<ColumnDef<any>[]>(
     () => [
       {
-        id: "epc",
+        id: "assetId",
         header: "EPC / Tag",
         cell: (row) => (
           <span className="text-xs text-slate-400 font-mono bg-white/5 px-2 py-1 rounded border border-white/5">
@@ -137,7 +126,7 @@ export default function StocktakeDetails({
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                handleViewLifecycle(row.epc);
+                handleViewLifecycle(row);
               }}
               className="p-2 hover:bg-rose-500/20 hover:text-rose-400 text-slate-400 rounded-lg transition-colors"
               title="View Asset Lifecycles"
@@ -168,30 +157,6 @@ export default function StocktakeDetails({
             Manage and track your stocktake details in real-time.
           </p>
         </div>
-
-        {/* <div className="flex items-center justify-self-center gap-4">
-          <button
-            onClick={() => setIsImportSidebarOpen(true)}
-            className="bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-xl font-medium transition-all shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2 group active:scale-95"
-          >
-            <File
-              size={20}
-              className="group-hover:rotate-90 transition-transform duration-300"
-            />
-            Bulk Import File
-          </button>
-
-          <button
-            onClick={handleAddClick}
-            className="bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-xl font-medium transition-all shadow-lg shadow-blue-500/20 flex items-center justify-center gap-2 group active:scale-95"
-          >
-            <Plus
-              size={20}
-              className="group-hover:rotate-90 transition-transform duration-300"
-            />
-            Add New Asset
-          </button>
-        </div> */}
       </div>
 
       {/* Filters & Search Section */}
@@ -255,7 +220,7 @@ export default function StocktakeDetails({
               data={data.data.items}
               columns={columns}
               rowKey={(row) => row.epc}
-              onRowClick={(row) => handleViewLifecycle(row.epc)}
+              onRowClick={(row) => handleViewLifecycle(row)}
             />
 
             <Pagination
@@ -273,32 +238,27 @@ export default function StocktakeDetails({
       <ActionFormSidebar
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
-        title={editingAsset ? "Edit Asset" : "Add New Asset"}
+        title="Asset Lifecycle"
         subtitle={
-          editingAsset
-            ? `Updating ${editingAsset.assetCode}`
-            : "Fill in the details to create a new asset."
+          viewingAsset
+            ? `Timeline for ${viewingAsset.assetCode} - ${viewingAsset.assetName}`
+            : "Asset Lifecycle events"
         }
-        onSave={() => {}}
+        onSave={() => setIsSidebarOpen(false)}
         isSaving={false}
-        submitLabel={editingAsset ? "Update Asset" : "Save Asset"}
+        submitLabel="Close"
+        showFooter={false}
       >
-        {/* <AssetFormFields
-                formData={formData}
-                setFormData={setFormData}
-                isEdit={!!editingAsset}
-              /> */}
-        <div>test</div>
+        {viewingAsset?.assetId ? (
+          <AssetLifecycleTimelines assetId={viewingAsset.assetId} />
+        ) : (
+          <div className="flex flex-col items-center justify-center p-8 mt-4 text-center bg-white/5 border border-white/10 rounded-2xl">
+            <p className="text-slate-400 text-sm">
+              Asset ID is missing for this record.
+            </p>
+          </div>
+        )}
       </ActionFormSidebar>
-
-      {/* <AssetImportSidebar
-              isOpen={isImportSidebarOpen}
-              onClose={() => setIsImportSidebarOpen(false)}
-              onSuccess={() => {
-                refresh();
-                setTimeout(() => setIsImportSidebarOpen(false), 2000);
-              }}
-            /> */}
     </div>
   );
 }

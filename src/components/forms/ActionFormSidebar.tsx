@@ -9,11 +9,12 @@ interface ActionFormSidebarProps {
   onClose: () => void;
   title: React.ReactNode;
   subtitle?: React.ReactNode;
-  onSave: (e: React.FormEvent) => Promise<void> | void;
+  onSave?: (e: React.FormEvent) => Promise<void> | void;
   isSaving?: boolean;
   submitLabel?: string;
   children: React.ReactNode;
   widthClass?: string;
+  showFooter?: boolean;
 }
 
 export default function ActionFormSidebar({
@@ -26,13 +27,16 @@ export default function ActionFormSidebar({
   submitLabel = "Save",
   children,
   widthClass = "max-w-md",
+  showFooter = true,
 }: ActionFormSidebarProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await onSave(e);
+    if (onSave) {
+      await onSave(e);
+    }
   };
 
-  const footer = (
+  const footer = showFooter ? (
     <div className="flex items-center gap-3">
       <button
         type="button"
@@ -54,7 +58,7 @@ export default function ActionFormSidebar({
         {submitLabel}
       </button>
     </div>
-  );
+  ) : null;
 
   return (
     <GenericSidebar

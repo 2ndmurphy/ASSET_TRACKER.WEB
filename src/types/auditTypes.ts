@@ -11,6 +11,7 @@ export interface StocktakeHistoryItem {
 }
 
 export interface StocktakeDetailItem {
+  assetId: number;
   epc: string;
   assetName: string;
   assetCode: string;
@@ -18,6 +19,34 @@ export interface StocktakeDetailItem {
   note: string | null;
 }
 
+export interface AssetLifecycleItem {
+  eventDate: string;
+  eventType: string;
+  performedBy: string;
+  locationName: string;
+  description: string;
+  status: string;
+  deviceName: string;
+}
+
+export interface StocktakeComparisonItem {
+  assetCode: string;
+  assetName: string;
+  previousAuditLocation: string;
+  currentAuditLocation: string;
+  previousStatus: string;
+  currentStatus: string;
+  auditAnalysis: string;
+  currentNote: string | null;
+}
+
+// Requests Payload
+export interface StocktakeComparisonRequest {
+  previousStocktakeId: number;
+  currentStocktakeId: number;
+}
+
+// API Response and Data
 export interface ApiResponse<T> {
   success: boolean;
   data: T;
@@ -38,5 +67,24 @@ export interface StocktakeDetailData {
   pageSize: number;
 }
 
+export interface AssetLifecycleData {
+  assetId: number;
+  items: AssetLifecycleItem[];
+  // totalCount: number;
+  // pageNumber: number;
+  // pageSize: number;
+}
+
+export interface StocktakeComparisonData {
+  previousStocktakeId: number;
+  currentStocktakeId: number;
+  items: StocktakeComparisonItem[];
+  // totalCount: number;
+  // pageNumber: number;
+  // pageSize: number;
+}
+
 export type StocktakeHistoryResponse = ApiResponse<StocktakeHistoryData>;
 export type StocktakeDetailResponse = ApiResponse<StocktakeDetailData>;
+export type AssetLifecycleResponse = ApiResponse<AssetLifecycleData>;
+export type StocktakeComparisonResponse = ApiResponse<StocktakeComparisonData>;

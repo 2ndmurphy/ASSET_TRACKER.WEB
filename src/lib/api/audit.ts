@@ -1,7 +1,10 @@
 import { apiClient } from "./client";
 import {
+  StocktakeComparisonRequest,
   StocktakeHistoryResponse,
   StocktakeDetailResponse,
+  AssetLifecycleResponse,
+  StocktakeComparisonResponse,
 } from "../../types/auditTypes";
 
 export const getStocktakeHistories = async (
@@ -32,5 +35,20 @@ export const getStocktakeDetails = async (
 
   return apiClient.get<StocktakeDetailResponse>(
     `/audit-report/stocktake-histories/${stocktakeId}?${params.toString()}`,
+  );
+};
+
+export const getAssetLifecycles = async (assetId: number) => {
+  return apiClient.get<AssetLifecycleResponse>(
+    `/audit-report/asset-lifecycles/${assetId}`,
+  );
+};
+
+export const getStocktakeComparison = async (
+  request: StocktakeComparisonRequest,
+) => {
+  return apiClient.post<StocktakeComparisonResponse>(
+    `/audit-report/stocktake-comparison`,
+    request,
   );
 };

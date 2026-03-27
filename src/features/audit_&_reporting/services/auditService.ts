@@ -1,10 +1,15 @@
 import {
   getStocktakeHistories,
   getStocktakeDetails,
+  getAssetLifecycles,
+  getStocktakeComparison,
 } from "@/src/lib/api/audit";
 import {
+  StocktakeComparisonRequest,
   StocktakeHistoryResponse,
   StocktakeDetailResponse,
+  AssetLifecycleResponse,
+  StocktakeComparisonResponse,
 } from "@/src/types/auditTypes";
 
 export async function getStocktakeHistoriesService(
@@ -36,6 +41,32 @@ export async function getStocktakeDetailsService(
 
   if (response && response.success === false) {
     throw new Error(response.message || "Failed to fetch stocktake details.");
+  }
+
+  return response;
+}
+
+export async function getAssetLifecyclesService(
+  assetId: number,
+): Promise<AssetLifecycleResponse> {
+  const response = await getAssetLifecycles(assetId);
+
+  if (response && response.success === false) {
+    throw new Error(response.message || "Failed to fetch asset lifecycles.");
+  }
+
+  return response;
+}
+
+export async function getStocktakeComparisonService(
+  request: StocktakeComparisonRequest,
+): Promise<StocktakeComparisonResponse> {
+  const response = await getStocktakeComparison(request);
+
+  if (response && response.success === false) {
+    throw new Error(
+      response.message || "Failed to fetch stocktake comparison.",
+    );
   }
 
   return response;
