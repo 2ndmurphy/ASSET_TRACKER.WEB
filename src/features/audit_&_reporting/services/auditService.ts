@@ -1,4 +1,5 @@
 import {
+  getAuditReportSummary,
   getStocktakeHistories,
   getStocktakeDetails,
   getAssetLifecycles,
@@ -6,11 +7,24 @@ import {
 } from "@/src/lib/api/audit";
 import {
   StocktakeComparisonRequest,
+  AuditReportSummaryResponse,
   StocktakeHistoryResponse,
   StocktakeDetailResponse,
   AssetLifecycleResponse,
   StocktakeComparisonResponse,
 } from "@/src/types/auditTypes";
+
+export async function getAuditReportSummaryService(): Promise<AuditReportSummaryResponse> {
+  const response = await getAuditReportSummary();
+
+  if (response && response.success === false) {
+    throw new Error(
+      response.message || "Failed to fetch audit report summary.",
+    );
+  }
+
+  return response;
+}
 
 export async function getStocktakeHistoriesService(
   pageNumber: number,

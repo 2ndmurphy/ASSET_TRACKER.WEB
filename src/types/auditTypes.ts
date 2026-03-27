@@ -1,3 +1,10 @@
+export interface AuditReportSummaryItem {
+  totalShrinkage: number;
+  recoveryRate: number;
+  totalRecovered: number;
+  topMissingAssetType: string;
+}
+
 export interface StocktakeHistoryItem {
   stocktakeId: number;
   auditDate: string;
@@ -53,6 +60,10 @@ export interface ApiResponse<T> {
   message: string;
 }
 
+export interface AuditReportSummaryData {
+  summary: AuditReportSummaryItem;
+}
+
 export interface StocktakeHistoryData {
   items: StocktakeHistoryItem[];
   totalCount: number;
@@ -84,6 +95,7 @@ export interface StocktakeComparisonData {
   // pageSize: number;
 }
 
+export type AuditReportSummaryResponse = ApiResponse<AuditReportSummaryData>;
 export type StocktakeHistoryResponse = ApiResponse<StocktakeHistoryData>;
 export type StocktakeDetailResponse = ApiResponse<StocktakeDetailData>;
 export type AssetLifecycleResponse = ApiResponse<AssetLifecycleData>;

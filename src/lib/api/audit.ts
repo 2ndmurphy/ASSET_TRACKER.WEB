@@ -1,11 +1,16 @@
 import { apiClient } from "./client";
 import {
   StocktakeComparisonRequest,
+  AuditReportSummaryResponse,
   StocktakeHistoryResponse,
   StocktakeDetailResponse,
   AssetLifecycleResponse,
   StocktakeComparisonResponse,
 } from "../../types/auditTypes";
+
+export const getAuditReportSummary = async () => {
+  return apiClient.get<AuditReportSummaryResponse>(`/audit-report/summary`);
+};
 
 export const getStocktakeHistories = async (
   pageNumber: number,
@@ -48,7 +53,7 @@ export const getStocktakeComparison = async (
   request: StocktakeComparisonRequest,
 ) => {
   return apiClient.post<StocktakeComparisonResponse>(
-    `/audit-report/stocktake-comparison`,
+    `/audit-report/stocktake-comparisons`,
     request,
   );
 };

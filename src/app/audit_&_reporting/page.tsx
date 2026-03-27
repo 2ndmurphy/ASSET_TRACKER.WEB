@@ -4,6 +4,8 @@ import React, { useState, useMemo, useRef } from "react";
 import { useStocktakeHistories } from "@/src/features/audit_&_reporting/hooks/useStocktakeHistories";
 import DataTable, { ColumnDef } from "@/src/components/ui/DataTable";
 import Pagination from "@/src/components/ui/Pagination";
+import StatCard from "@/src/features/dashboard/components/StatCard";
+import { Shrink, Percent, ShieldAlert } from "lucide-react";
 import {
   Search,
   RefreshCw,
@@ -12,12 +14,17 @@ import {
   SlidersHorizontal,
   Trash,
   ArrowLeft,
-  ChevronDown,
+  Shield,
 } from "lucide-react";
+import { StatCardSkeleton } from "@/src/components/ui/Skeletons";
 import { diffForHumans } from "@/src/lib/utils/diffForHumans";
 import StocktakeDetails from "@/src/features/audit_&_reporting/components/StocktakeDetails";
+import StocktakeComparison from "@/src/features/audit_&_reporting/components/StocktakeComparison";
+import { useAuditSummary } from "@/src/features/audit_&_reporting/hooks/useAuditSummary";
 
 export default function AuditReportingPage() {
+  const [selectedRows, setSelectedRows] = useState<number[]>([]);
+  const [isComparing, setIsComparing] = useState(false);
   const [page, setPage] = useState(1);
   const [pageSize] = useState(10);
   const [searchTerm, setSearchTerm] = useState("");
@@ -26,11 +33,17 @@ export default function AuditReportingPage() {
   const [selectedStocktakeId, setSelectedStocktakeId] = useState<number | null>(
     null,
   );
-  const { data, loading, error, refresh } = useStocktakeHistories(
-    page,
-    pageSize,
-    searchTerm,
-  );
+  const {
+    data: summaryData,
+    loading: summaryLoading,
+    error: summaryError,
+  } = useAuditSummary();
+  const {
+    data: stocktakeData,
+    loading: stocktakeLoading,
+    error: stocktakeError,
+    refresh,
+  } = useStocktakeHistories(page, pageSize, searchTerm);
   const detailsRef = useRef<HTMLDivElement>(null);
 
   const handleSearch = (e: React.FormEvent) => {
@@ -54,9 +67,58 @@ export default function AuditReportingPage() {
     setSelectedStocktakeId(null);
   };
 
+  const toggleRowSelection = (id: number) => {
+    setSelectedRows((prev) =>
+      prev.includes(id) ? prev.filter((r) => r !== id) : [...prev, id],
+    );
+  };
+
+  const toggleAllRowSelection = () => {
+    if (stocktakeData?.data?.items) {
+      if (selectedRows.length === stocktakeData.data.items.length) {
+        setSelectedRows([]);
+      } else {
+        setSelectedRows(stocktakeData.data.items.map((r) => r.stocktakeId));
+      }
+    }
+  };
+
   // Dynamic Columns
   const columns = useMemo<ColumnDef<any>[]>(
     () => [
+      {
+        id: "select",
+        header: (
+          <div className="flex justify-center items-center w-full">
+            <input
+              type="checkbox"
+              className="w-4 h-4 rounded border-white/20 bg-white/5 cursor-pointer accent-blue-500"
+              checked={
+                !!stocktakeData?.data?.items &&
+                selectedRows.length === stocktakeData.data.items.length &&
+                stocktakeData.data.items.length > 0
+              }
+              onChange={toggleAllRowSelection}
+            />
+          </div>
+        ),
+        cell: (row) => (
+          <div className="flex justify-center items-center w-full">
+            <input
+              type="checkbox"
+              className="w-4 h-4 rounded border-white/20 bg-white/5 cursor-pointer accent-blue-500"
+              checked={selectedRows.includes(row.stocktakeId)}
+              onChange={(e) => {
+                e.stopPropagation();
+                toggleRowSelection(row.stocktakeId);
+              }}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        ),
+        className: "w-12 px-2",
+        headerClassName: "w-12 px-2",
+      },
       {
         id: "auditDate",
         header: "Audit Date",
@@ -170,10 +232,10 @@ export default function AuditReportingPage() {
         ),
       },
     ],
-    [],
+    [selectedRows, stocktakeData?.data?.items],
   );
 
-  const totalCount = data?.data?.totalCount ?? 0;
+  const totalCount = stocktakeData?.data?.totalCount ?? 0;
   const safePageSize = pageSize > 0 ? pageSize : 1;
   const totalPages = Math.ceil(totalCount / safePageSize);
 
@@ -183,7 +245,7 @@ export default function AuditReportingPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-            {/* <Package className="text-blue-500" /> */}
+            <Shield className="text-blue-500" />
             Audit & Reporting
           </h2>
           <p className="text-slate-400 text-sm">
@@ -191,6 +253,49 @@ export default function AuditReportingPage() {
           </p>
         </div>
       </div>
+
+      {/* Summary Cards */}
+      {summaryLoading ? (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+          </div>
+        </>
+      ) : summaryError ? (
+        <div className="p-6 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400">
+          Error: {summaryError.message}
+        </div>
+      ) : (
+        summaryData && (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <StatCard
+                title="Total Shringkage"
+                value={summaryData.data.summary.totalShrinkage}
+                icon={<Shrink className="text-green-400" size={24} />}
+              />
+              <StatCard
+                title="Recovery Rate"
+                value={summaryData.data.summary.recoveryRate}
+                icon={<Percent size={24} />}
+              />
+              <StatCard
+                title="Total Recovered"
+                value={summaryData.data.summary.totalRecovered}
+                icon={<RefreshCw className="text-yellow-400" size={24} />}
+              />
+              <StatCard
+                title="Top Missing Asset"
+                value={summaryData.data.summary.topMissingAssetType}
+                icon={<ShieldAlert size={24} />}
+              />
+            </div>
+          </>
+        )
+      )}
 
       {/* Filters & Search Section */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/5 border border-white/10 p-4 rounded-2xl backdrop-blur-md">
@@ -209,12 +314,33 @@ export default function AuditReportingPage() {
         </form>
 
         <div className="flex items-center gap-3 w-full sm:w-auto">
+          {selectedRows.length >= 2 && (
+            <button
+              onClick={() => {
+                setIsComparing(true);
+                setSelectedStocktakeId(null);
+                setTimeout(() => {
+                  detailsRef.current?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start",
+                  });
+                }, 100);
+              }}
+              className="animate-in fade-in zoom-in-95 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-lg shadow-indigo-500/20 transition-all text-sm font-medium flex items-center justify-center gap-2"
+            >
+              Compare
+            </button>
+          )}
+
           <button
             onClick={() => refresh()}
             className="p-2.5 bg-white/5 border border-white/10 rounded-xl text-slate-400 hover:bg-white/10 transition-colors"
             title="Refresh"
           >
-            <RefreshCw size={18} className={loading ? "animate-spin" : ""} />
+            <RefreshCw
+              size={18}
+              className={stocktakeLoading ? "animate-spin" : ""}
+            />
           </button>
           <button className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-slate-300 hover:bg-white/10 transition-colors text-sm font-medium">
             <SlidersHorizontal size={16} />
@@ -222,22 +348,22 @@ export default function AuditReportingPage() {
           </button>
           <div className="h-8 w-px bg-white/10 hidden sm:block"></div>
           <span className="text-xs text-slate-500 font-medium whitespace-nowrap">
-            {data?.data?.items
-              ? `Showing ${data.data.items.length} of ${data.data.totalCount}`
+            {stocktakeData?.data?.items
+              ? `Showing ${stocktakeData.data.items.length} of ${stocktakeData.data.totalCount}`
               : "Loading..."}
           </span>
         </div>
       </div>
 
       {/* Table Section */}
-      {loading && !data?.data?.items ? (
+      {stocktakeLoading && !stocktakeData?.data?.items ? (
         <div className="space-y-4">
           <div className="h-[400px] w-full bg-white/5 animate-pulse rounded-2xl border border-white/10" />
         </div>
-      ) : error ? (
+      ) : stocktakeError ? (
         <div className="p-8 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-center">
           <p className="text-rose-400 font-medium mb-4">
-            Error loading assets: {error.message}
+            Error loading assets: {stocktakeError.message}
           </p>
           <button
             onClick={() => refresh()}
@@ -247,10 +373,10 @@ export default function AuditReportingPage() {
           </button>
         </div>
       ) : (
-        data?.data?.items && (
+        stocktakeData?.data?.items && (
           <>
             <DataTable
-              data={data.data.items}
+              data={stocktakeData.data.items}
               columns={columns}
               rowKey={(row) => row.stocktakeId}
               onRowClick={(row) => handleView(row.stocktakeId)}
@@ -268,7 +394,7 @@ export default function AuditReportingPage() {
       )}
 
       {/* Stocktake Details Section */}
-      {selectedStocktakeId !== null && (
+      {selectedStocktakeId !== null && !isComparing && (
         <div
           ref={detailsRef}
           className="mt-2 animate-in fade-in slide-in-from-bottom-4 duration-300"
@@ -287,6 +413,32 @@ export default function AuditReportingPage() {
             </span>
           </div>
           <StocktakeDetails stocktakeId={selectedStocktakeId} />
+        </div>
+      )}
+
+      {/* Comparison Section */}
+      {isComparing && selectedRows.length >= 2 && (
+        <div
+          ref={detailsRef}
+          className="mt-2 animate-in fade-in slide-in-from-bottom-4 duration-300"
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <button
+              onClick={() => setIsComparing(false)}
+              className="flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-slate-400 hover:bg-white/10 hover:text-white transition-colors text-sm"
+            >
+              <ArrowLeft size={16} />
+              Close Comparison
+            </button>
+            <div className="h-px flex-1 bg-white/10" />
+            <span className="text-xs text-slate-500 font-medium whitespace-nowrap overflow-hidden text-ellipsis">
+              Comparing Stocktakes: {selectedRows.join(" vs ")}
+            </span>
+          </div>
+          <StocktakeComparison
+            previousStocktakeId={Math.min(...selectedRows)}
+            currentStocktakeId={Math.max(...selectedRows)}
+          />
         </div>
       )}
     </div>
