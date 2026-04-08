@@ -9,7 +9,7 @@ import {
 } from "../../types/auditTypes";
 
 export const getAuditReportSummary = async () => {
-  return apiClient.get<AuditReportSummaryResponse>(`/audit-report/summary`);
+  return apiClient.get<AuditReportSummaryResponse>(`/web/audit-report/summary`);
 };
 
 export const getStocktakeHistories = async (
@@ -23,7 +23,7 @@ export const getStocktakeHistories = async (
   if (search) params.append("search", search);
 
   return apiClient.get<StocktakeHistoryResponse>(
-    `/audit-report/stocktake-histories?${params.toString()}`,
+    `/web/audit-report/stocktake-histories?${params.toString()}`,
   );
 };
 
@@ -39,13 +39,13 @@ export const getStocktakeDetails = async (
   if (search) params.append("search", search);
 
   return apiClient.get<StocktakeDetailResponse>(
-    `/audit-report/stocktake-histories/${stocktakeId}?${params.toString()}`,
+    `/web/audit-report/stocktake-histories/${stocktakeId}?${params.toString()}`,
   );
 };
 
 export const getAssetLifecycles = async (assetId: number) => {
   return apiClient.get<AssetLifecycleResponse>(
-    `/audit-report/asset-lifecycles/${assetId}`,
+    `/web/audit-report/asset-lifecycles/${assetId}`,
   );
 };
 
@@ -53,7 +53,7 @@ export const getStocktakeComparison = async (
   request: StocktakeComparisonRequest,
 ) => {
   return apiClient.post<StocktakeComparisonResponse>(
-    `/audit-report/stocktake-comparisons`,
+    `/web/audit-report/stocktake-comparisons`,
     request,
   );
 };

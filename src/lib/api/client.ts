@@ -3,6 +3,7 @@ import axios, {
   InternalAxiosRequestConfig,
   AxiosRequestConfig,
 } from "axios";
+import { AuthResponse } from "@/src/types/authTypes";
 
 export type NormalizedError = {
   status?: number;
@@ -78,7 +79,7 @@ export function createApiClient(opts?: {
   baseURL?: string;
   withCredentials?: boolean;
 }): TypedAxiosInstance {
-  const baseURL = opts?.baseURL ?? process.env.NEXT_PUBLIC_API_BASE_URL ?? "";
+  const baseURL = opts?.baseURL ?? process.env.NEXT_PUBLIC_API_LOCAL_URL ?? "";
   const withCredentials = opts?.withCredentials ?? true;
 
   const instance = axios.create({
@@ -93,6 +94,10 @@ export function createApiClient(opts?: {
 
   instance.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
+      // Attach in-memory token if it exists
+      if (clientAccessToken && !config.headers.Authorization) {
+        config.headers.Authorization = `Bearer ${clientAccessToken}`;
+      }
       try {
         console.group(
           `🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`,
@@ -130,8 +135,47 @@ export function createApiClient(opts?: {
     failedQueue = [];
   };
 
+  // In-memory token storage for current client session
+  let clientAccessToken: string | null = null;
+  let clientRefreshToken: string | null = null;
+
+  // Sets token in memory and persists to HttpOnly cookie via Server Action
+  async function handleTokenPersistence(
+    accessToken: string,
+    refreshToken: string,
+  ) {
+    clientAccessToken = accessToken;
+    clientRefreshToken = refreshToken;
+    if (typeof window !== "undefined") {
+      try {
+        const { setAuthCookiesAction } =
+          await import("@/src/app/actions/auth-actions");
+        await setAuthCookiesAction(accessToken, refreshToken);
+      } catch (err) {
+        console.error("Failed to persist auth cookie:", err);
+      }
+    }
+  }
+
   instance.interceptors.response.use(
     (response) => {
+      const url = response.config.url || "";
+      const isAuthPath =
+        url.includes("/auth/login") ||
+        url.includes("/auth/register") ||
+        url.includes("/auth/refresh");
+
+      if (
+        isAuthPath &&
+        response.data &&
+        (response.data as AuthResponse).success
+      ) {
+        const authData = (response.data as AuthResponse).data;
+        if (authData && authData.accessToken) {
+          handleTokenPersistence(authData.accessToken, authData.refreshToken);
+        }
+      }
+
       console.group(
         `✅ API Response: ${response.config.method?.toUpperCase()} ${response.config.url}`,
       );
@@ -169,6 +213,10 @@ export function createApiClient(opts?: {
           console.log("🔄 Refresh response:", response);
 
           if (response.success) {
+            const newAccessToken = (response as AuthResponse).data.accessToken;
+            const newRefreshToken = (response as AuthResponse).data
+              .refreshToken;
+            await handleTokenPersistence(newAccessToken, newRefreshToken);
             processQueue(null);
             // Retry the original request
             return instance(originalRequest);
@@ -209,6 +257,6 @@ export function createApiClient(opts?: {
 }
 
 export const apiClient = createApiClient({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+  baseURL: "/api",
   withCredentials: true,
 });

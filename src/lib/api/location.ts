@@ -17,15 +17,15 @@ export const getLocationManagement = async (
   if (search) params.append("search", search);
 
   return apiClient.get<LocationManagementResponse>(
-    `/locations?${params.toString()}`,
+    `/web/locations?${params.toString()}`,
   );
 };
 
 export const getLocationById = async (id: number) =>
-  apiClient.get<SingleLocationResponse>(`/locations/${id}`);
+  apiClient.get<SingleLocationResponse>(`/web/locations/${id}`);
 
 export const createLocation = async (location: CreateLocationRequest) =>
-  apiClient.post<SingleLocationResponse>(`/locations/new`, location);
+  apiClient.post<SingleLocationResponse>(`/web/locations/new`, location);
 
 export const updateLocation = async (location: UpdateLocationRequest) =>
-  apiClient.patch<SingleLocationResponse>(`/locations/edit`, location);
+  apiClient.patch<SingleLocationResponse>(`/web/locations/edit`, location);

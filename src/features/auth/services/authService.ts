@@ -1,14 +1,9 @@
 import { loginApi, logoutApi, registerApi, getMeApi } from "@/src/lib/api/auth";
 
-import {
-  LoginRequest,
-  AuthResponse,
-  RegisterRequest,
-  User,
-} from "@/src/types/authTypes";
+import { AuthRequest, AuthResponse, User } from "@/src/types/authTypes";
 
 export async function loginService(
-  payload: LoginRequest,
+  payload: AuthRequest,
 ): Promise<AuthResponse> {
   const response = await loginApi(payload);
 
@@ -20,7 +15,7 @@ export async function loginService(
 }
 
 export async function registerService(
-  payload: RegisterRequest,
+  payload: AuthRequest,
 ): Promise<AuthResponse> {
   const response = await registerApi(payload);
 
@@ -38,9 +33,16 @@ export async function getMeService(): Promise<User> {
     throw new Error(response.message || "Failed to fetch user data");
   }
 
-  return response.user;
+  return response.data.user;
 }
 
 export async function logoutService(): Promise<void> {
   await logoutApi();
+  try {
+    const { deleteAuthCookiesAction } =
+      await import("@/src/app/actions/auth-actions");
+    await deleteAuthCookiesAction();
+  } catch (err) {
+    console.error("Failed to delete auth cookie during logout:", err);
+  }
 }

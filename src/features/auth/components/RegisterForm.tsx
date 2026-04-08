@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-
 import { useAuthContext } from "@/src/features/auth/context/AuthContext";
 
 export default function RegisterForm() {
@@ -27,7 +26,9 @@ export default function RegisterForm() {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     setFormData((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
@@ -43,7 +44,9 @@ export default function RegisterForm() {
       )}
 
       <div className="space-y-1">
-        <label className="text-xs font-medium text-slate-300 ml-1">Username</label>
+        <label className="text-xs font-medium text-slate-300 ml-1">
+          Username
+        </label>
         <input
           name="username"
           type="text"
@@ -55,34 +58,10 @@ export default function RegisterForm() {
         />
       </div>
 
-      {/* <div className="space-y-1">
-        <label className="text-xs font-medium text-slate-300 ml-1">Email</label>
-        <input
-          name="email"
-          type="email"
-          value={formData.email}
-          onChange={handleChange}
-          placeholder="email@example.com"
-          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
-          required
-        />
-      </div>
-
       <div className="space-y-1">
-        <label className="text-xs font-medium text-slate-300 ml-1">Role</label>
-        <select
-          name="role"
-          value={formData.role}
-          onChange={handleChange}
-          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all appearance-none"
-        >
-          <option value="Operator">Operator</option>
-          <option value="Admin">Admin</option>
-        </select>
-      </div> */}
-
-      <div className="space-y-1">
-        <label className="text-xs font-medium text-slate-300 ml-1">Password</label>
+        <label className="text-xs font-medium text-slate-300 ml-1">
+          Password
+        </label>
         <input
           name="password"
           type="password"
@@ -104,7 +83,10 @@ export default function RegisterForm() {
 
       <div className="text-center text-sm text-slate-400 mt-4">
         Already have an account?{" "}
-        <Link href="/auth/login" className="text-blue-400 hover:text-blue-300 font-medium">
+        <Link
+          href="/auth/login"
+          className="text-blue-400 hover:text-blue-300 font-medium"
+        >
           Sign In
         </Link>
       </div>

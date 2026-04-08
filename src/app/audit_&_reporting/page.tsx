@@ -125,7 +125,7 @@ export default function AuditReportingPage() {
         cell: (row) => (
           <div className="flex flex-col">
             <span className="text-sm text-slate-500 font-mono mt-0.5">
-              {diffForHumans(row.auditDate)}
+              {new Date(row.auditDate).toLocaleDateString()}
             </span>
           </div>
         ),
@@ -206,7 +206,7 @@ export default function AuditReportingPage() {
         header: "Action",
         className: "text-right",
         cell: (row) => (
-          <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex items-start justify-left gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -273,7 +273,7 @@ export default function AuditReportingPage() {
           <>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               <StatCard
-                title="Total Shringkage"
+                title="Total Shrinkage"
                 value={summaryData.data.summary.totalShrinkage}
                 icon={<Shrink className="text-green-400" size={24} />}
               />
@@ -379,7 +379,7 @@ export default function AuditReportingPage() {
               data={stocktakeData.data.items}
               columns={columns}
               rowKey={(row) => row.stocktakeId}
-              onRowClick={(row) => handleView(row.stocktakeId)}
+              onRowClick={() => {}}
             />
 
             <Pagination

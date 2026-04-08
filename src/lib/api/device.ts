@@ -18,27 +18,27 @@ export const getDeviceManagement = (
   if (search) params.append("search", search);
 
   return apiClient.get<DeviceManagementResponse>(
-    `/devices?${params.toString()}`,
+    `/web/devices?${params.toString()}`,
   );
 };
 
 export const getDeviceById = (id: number) =>
-  apiClient.get<SingleDeviceResponse>(`/devices/${id}`);
+  apiClient.get<SingleDeviceResponse>(`/web/devices/${id}`);
 
 export const createDevice = (device: CreateDeviceRequest) =>
-  apiClient.post<SingleDeviceResponse>(`/devices/new`, device);
+  apiClient.post<SingleDeviceResponse>(`/web/devices/new`, device);
 
 export const updateDevice = (device: UpdateDeviceRequest) =>
-  apiClient.patch<SingleDeviceResponse>(`/devices/update`, device);
+  apiClient.patch<SingleDeviceResponse>(`/web/devices/update`, device);
 
 export const deleteDevice = (deviceId: number) =>
-  apiClient.delete<SingleDeviceResponse>(`/devices/${deviceId}/delete`);
+  apiClient.delete<SingleDeviceResponse>(`/web/devices/${deviceId}/delete`);
 
 export const killSwitch = (targetId: KillOperationRequest) =>
-  apiClient.post<SingleDeviceResponse>(`/devices/kill-device`, targetId);
+  apiClient.post<SingleDeviceResponse>(`/web/devices/kill-device`, targetId);
 
 export const killScan = (targetId: KillOperationRequest) =>
-  apiClient.post<SingleDeviceResponse>(`/devices/kill-scan-task`, targetId);
+  apiClient.post<SingleDeviceResponse>(`/web/devices/kill-scan-task`, targetId);
 
 export const killUser = (targetId: KillOperationRequest) =>
-  apiClient.post<SingleDeviceResponse>(`/devices/force-logout`, targetId);
+  apiClient.post<SingleDeviceResponse>(`/web/devices/force-logout`, targetId);

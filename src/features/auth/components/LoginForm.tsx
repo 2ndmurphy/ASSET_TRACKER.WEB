@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-
 import { useAuthContext } from "@/src/features/auth/context/AuthContext";
 
 export default function LoginForm() {
@@ -36,11 +35,15 @@ export default function LoginForm() {
       )}
 
       <div className="space-y-2">
-        <label className="text-sm font-medium text-slate-300 ml-1">Username</label>
+        <label className="text-sm font-medium text-slate-300 ml-1">
+          Username
+        </label>
         <input
           type="text"
           value={formData.username}
-          onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, username: e.target.value })
+          }
           placeholder="Enter your username"
           className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
           required
@@ -48,11 +51,15 @@ export default function LoginForm() {
       </div>
 
       <div className="space-y-2">
-        <label className="text-sm font-medium text-slate-300 ml-1">Password</label>
+        <label className="text-sm font-medium text-slate-300 ml-1">
+          Password
+        </label>
         <input
           type="password"
           value={formData.password}
-          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, password: e.target.value })
+          }
           placeholder="Enter your password"
           className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
           required
@@ -69,7 +76,10 @@ export default function LoginForm() {
 
       <div className="text-center text-sm text-slate-400 mt-4">
         Don&apos;t have an account?{" "}
-        <Link href="/auth/register" className="text-blue-400 hover:text-blue-300 font-medium">
+        <Link
+          href="/auth/register"
+          className="text-blue-400 hover:text-blue-300 font-medium"
+        >
           Sign Up
         </Link>
       </div>

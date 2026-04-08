@@ -47,7 +47,7 @@ export default function StocktakeComparison({
       },
       {
         id: "locations",
-        header: "Locations (Prev -> Curr)",
+        header: "Locations (Prev → Curr)",
         cell: (row) => (
           <div className="flex items-center gap-2 text-xs">
             <span className="text-slate-400 bg-white/5 px-2 py-1 rounded">

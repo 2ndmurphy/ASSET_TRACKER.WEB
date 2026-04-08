@@ -176,7 +176,7 @@ export default function AssetManagementPage() {
         header: "Action",
         className: "text-right",
         cell: (row) => (
-          <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex items-start justify-left gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             <button
               onClick={(e) => {
                 e.stopPropagation();

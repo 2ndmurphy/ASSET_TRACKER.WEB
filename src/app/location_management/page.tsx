@@ -15,9 +15,11 @@ import {
   RefreshCw,
   SlidersHorizontal,
   BookText,
+  Trash,
 } from "lucide-react";
 import { Eye, Edit2, MoreVertical, MapPin, Tag, Clock } from "lucide-react";
 import { LocationItem } from "@/src/types/locationTypes";
+import { diffForHumans } from "@/src/lib/utils/diffForHumans";
 
 function getStatusStyles(status: string) {
   switch (status.toLowerCase()) {
@@ -110,17 +112,12 @@ export default function LocationManagementPage() {
       },
       {
         id: "lastUpdatedAt",
-        header: "Last Updated At",
+        header: "Last Updated",
         accessor: "lastUpdatedAt",
         cell: (row) => (
           <div className="flex items-center gap-2 text-slate-400 text-sm">
             <Clock size={14} className="text-blue-400" />
-            <span>
-              {new Date(row.lastUpdatedAt).toLocaleString([], {
-                dateStyle: "short",
-                timeStyle: "short",
-              }) || "Not updated yet."}
-            </span>
+            <span>{diffForHumans(row.lastUpdatedAt)}</span>
           </div>
         ),
       },
@@ -129,7 +126,7 @@ export default function LocationManagementPage() {
         header: "Action",
         className: "text-right",
         cell: (row) => (
-          <div className="flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="flex items-start justify-left gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -149,6 +146,16 @@ export default function LocationManagementPage() {
               title="Edit Asset"
             >
               <Edit2 size={16} />
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleView(row.id);
+              }}
+              className="p-2 hover:bg-rose-500/20 hover:text-rose-400 text-slate-400 rounded-lg transition-colors"
+              title="Delete Location"
+            >
+              <Trash size={16} />
             </button>
           </div>
         ),

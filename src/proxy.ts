@@ -8,44 +8,53 @@ import type { NextRequest } from "next/server";
  */
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const accessToken = request.cookies.get("access_token")?.value;
 
-  // Define public routes that don't require authentication
-  const isPublicRoute =
-    pathname.startsWith("/auth/login") ||
-    pathname.startsWith("/auth/register") ||
-    pathname.startsWith("/_next") ||
-    pathname.includes("/favicon.ico");
+  // Skip static & internal
+  if (pathname.startsWith("/_next") || pathname.includes("/favicon.ico")) {
+    return NextResponse.next();
+  }
 
-  // Check for the 'access_token' cookie
-  const accessToken = request.cookies.get("access_token");
+  // ✅ Handle API Requests: Don't redirect API calls like pages
+  if (pathname.startsWith("/api/")) {
+    if (accessToken) {
+      const requestHeaders = new Headers(request.headers);
+      requestHeaders.set("Authorization", `Bearer ${accessToken}`);
+      return NextResponse.next({ request: { headers: requestHeaders } });
+    }
+    return NextResponse.next();
+  }
 
-  // 1. If user is authenticated and trying to access /auth routes, redirect to dashboard
-  if (
-    accessToken &&
-    (pathname.startsWith("/auth/login") ||
-      pathname.startsWith("/auth/register"))
-  ) {
+  const isAuthPage = pathname.startsWith("/auth");
+  const isRoot = pathname === "/";
+  const isProtected = !isAuthPage && !isRoot;
+
+  // ✅ Case 1: belum login → akses protected
+  if (!accessToken && isProtected) {
+    return NextResponse.redirect(new URL("/auth/login", request.url));
+  }
+
+  // ✅ Case 2: sudah login → akses auth page
+  if (accessToken && isAuthPage) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
-  // 2. If user is authenticated and at root, redirect to dashboard
-  if (accessToken && pathname === "/") {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+  // ✅ Case 3: root handling
+  if (isRoot) {
+    return NextResponse.redirect(
+      new URL(accessToken ? "/dashboard" : "/auth/login", request.url),
+    );
   }
 
-  // 3. If there's no access token and it's not a public route, redirect to login
-  if (!accessToken && !isPublicRoute) {
-    const loginUrl = new URL("/auth/login", request.url);
-    // Preserve the attempted URL to redirect back after login
-    loginUrl.searchParams.set("callbackUrl", encodeURIComponent(pathname));
-    return NextResponse.redirect(loginUrl);
-  }
+  console.log({
+    path: pathname,
+    token: accessToken,
+  });
 
-  // Allow the request to proceed
   return NextResponse.next();
 }
 
 // Config to specify which paths the middleware should run on
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };

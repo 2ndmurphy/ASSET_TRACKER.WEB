@@ -24,7 +24,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const USER_STORAGE_KEY = "wisecon_user_context";
+const USER_STORAGE_KEY = "asset_tracker_user_context";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -90,8 +90,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const login = async (data: any) => {
-    // Actual login is handled by the useAuth hook,
-    // but we refresh the user data here to sync global state.
     await fetchUser(true);
   };
 

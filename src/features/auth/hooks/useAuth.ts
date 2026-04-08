@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { loginService, registerService } from "../services/authService";
 import { NormalizedError } from "@/src/lib/api/client";
-import { LoginRequest, RegisterRequest } from "@/src/types/authTypes";
+import { AuthRequest } from "@/src/types/authTypes";
 
 export function useAuth() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<NormalizedError | null>(null);
 
-  async function login(payload: LoginRequest) {
+  async function login(payload: AuthRequest) {
     setLoading(true);
     setError(null);
 
@@ -22,7 +22,7 @@ export function useAuth() {
     }
   }
 
-  async function register(payload: RegisterRequest) {
+  async function register(payload: AuthRequest) {
     setLoading(true);
     setError(null);
 
