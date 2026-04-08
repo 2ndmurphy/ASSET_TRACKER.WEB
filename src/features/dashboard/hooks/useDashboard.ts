@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { getDashboardOverviewService } from "../services/dashboardService";
 import { DashboardOverviewData } from "@/src/types/dashboardTypes";
-import { NormalizedError } from "@/src/lib/api/client";
+import { NormalizedError } from "@/src/lib/client";
 
 export function useDashboard() {
   const [data, setData] = useState<DashboardOverviewData | null>(null);

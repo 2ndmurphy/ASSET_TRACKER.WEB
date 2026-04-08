@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { createLocationService } from "../services/locationService";
 import { LocationItem, CreateLocationRequest } from "@/src/types/locationTypes";
-import { NormalizedError } from "@/src/lib/api/client";
+import { NormalizedError } from "@/src/lib/client";
 
 export function useCreateLocation() {
   const [data, setData] = useState<LocationItem | null>(null);
@@ -26,6 +26,6 @@ export function useCreateLocation() {
     data,
     loading,
     error,
-    createLocation
+    createLocation,
   };
 }

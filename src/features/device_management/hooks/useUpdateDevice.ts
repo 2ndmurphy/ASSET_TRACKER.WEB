@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { updateDeviceService } from "../services/deviceService";
-import { NormalizedError } from "@/src/lib/api/client";
+import { NormalizedError } from "@/src/lib/client";
 import { DeviceItem, UpdateDeviceRequest } from "@/src/types/deviceTypes";
 
 export function useUpdateDevice() {

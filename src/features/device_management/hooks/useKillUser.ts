@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { killUserService } from "../services/deviceService";
 import { DeviceItem, KillOperationRequest } from "@/src/types/deviceTypes";
-import { NormalizedError } from "@/src/lib/api/client";
+import { NormalizedError } from "@/src/lib/client";
 
 export function useKillUser() {
   const [data, setData] = useState<DeviceItem | null>(null);

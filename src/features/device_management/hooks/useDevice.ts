@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { getDeviceManagementService } from "../services/deviceService";
 import { DeviceManagementResponse } from "@/src/types/deviceTypes";
-import { NormalizedError } from "@/src/lib/api/client";
+import { NormalizedError } from "@/src/lib/client";
 
 export function useDeviceManagement(
   pageNumber: number,

@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { killScanService } from "../services/deviceService";
 import { DeviceItem, KillOperationRequest } from "@/src/types/deviceTypes";
-import { NormalizedError } from "@/src/lib/api/client";
+import { NormalizedError } from "@/src/lib/client";
 
 export function useKillScan() {
   const [data, setData] = useState<DeviceItem | null>(null);

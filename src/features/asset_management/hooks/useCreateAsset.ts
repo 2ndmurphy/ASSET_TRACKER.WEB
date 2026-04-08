@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { createAssetService } from "../services/assetService";
 import { AssetItem, CreateAssetRequest } from "@/src/types/assetTypes";
-import { NormalizedError } from "@/src/lib/api/client";
+import { NormalizedError } from "@/src/lib/client";
 
 export function useCreateAsset() {
   const [data, setData] = useState<AssetItem | null>(null);
@@ -26,6 +26,6 @@ export function useCreateAsset() {
     data,
     loading,
     error,
-    createAsset
+    createAsset,
   };
 }

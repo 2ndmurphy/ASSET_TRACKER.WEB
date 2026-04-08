@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { loginService, registerService } from "../services/authService";
-import { NormalizedError } from "@/src/lib/api/client";
+import { NormalizedError } from "@/src/lib/client";
 import { AuthRequest } from "@/src/types/authTypes";
 
 export function useAuth() {

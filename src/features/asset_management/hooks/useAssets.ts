@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { getAssetCatalogService } from "../services/assetService";
 import { AssetCatalogResponse } from "@/src/types/assetTypes";
-import { NormalizedError } from "@/src/lib/api/client";
+import { NormalizedError } from "@/src/lib/client";
 import { useDebounce } from "@/src/hooks/useDebounce";
 
 export function useAssets(

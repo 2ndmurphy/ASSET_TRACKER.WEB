@@ -79,7 +79,8 @@ export function createApiClient(opts?: {
   baseURL?: string;
   withCredentials?: boolean;
 }): TypedAxiosInstance {
-  const baseURL = opts?.baseURL ?? process.env.NEXT_PUBLIC_API_LOCAL_URL ?? "";
+  const baseURL =
+    opts?.baseURL ?? process.env.NEXT_PUBLIC_API_DEVELOPMENT_URL ?? "";
   const withCredentials = opts?.withCredentials ?? true;
 
   const instance = axios.create({
@@ -208,7 +209,7 @@ export function createApiClient(opts?: {
 
         try {
           // Dynamic import to avoid circular dependency
-          const { refreshToken } = await import("./auth");
+          const { refreshToken } = await import("./api/auth");
           const response = await refreshToken();
           console.log("🔄 Refresh response:", response);
 

@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { bulkImportAssetsService } from "../services/assetService";
 import { BulkImportAssetsResponse } from "@/src/types/assetTypes";
-import { NormalizedError } from "@/src/lib/api/client";
+import { NormalizedError } from "@/src/lib/client";
 
 export function useBulkImport(file: File) {
   const [loading, setLoading] = useState(true);

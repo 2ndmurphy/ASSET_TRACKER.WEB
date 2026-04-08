@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { updateLocationService } from "../services/locationService";
 import { LocationItem, UpdateLocationRequest } from "@/src/types/locationTypes";
-import { NormalizedError } from "@/src/lib/api/client";
+import { NormalizedError } from "@/src/lib/client";
 
 export function useUpdateLocation() {
   const [data, setData] = useState<LocationItem | null>(null);
@@ -26,6 +26,6 @@ export function useUpdateLocation() {
     data,
     loading,
     error,
-    updateLocation
+    updateLocation,
   };
 }

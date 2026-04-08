@@ -1,4 +1,4 @@
-import { apiClient } from "./client";
+import { apiClient } from "../client";
 import {
   DeviceManagementResponse,
   SingleDeviceResponse,
@@ -29,7 +29,7 @@ export const createDevice = (device: CreateDeviceRequest) =>
   apiClient.post<SingleDeviceResponse>(`/web/devices/new`, device);
 
 export const updateDevice = (device: UpdateDeviceRequest) =>
-  apiClient.patch<SingleDeviceResponse>(`/web/devices/update`, device);
+  apiClient.patch<SingleDeviceResponse>(`/web/devices/edit`, device);
 
 export const deleteDevice = (deviceId: number) =>
   apiClient.delete<SingleDeviceResponse>(`/web/devices/${deviceId}/delete`);

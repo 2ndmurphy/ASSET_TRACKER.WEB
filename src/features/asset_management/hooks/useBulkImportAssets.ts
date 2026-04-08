@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { bulkImportAssetsService } from "../services/assetService";
 import { BulkImportResponse } from "@/src/types/assetTypes";
-import { NormalizedError } from "@/src/lib/api/client";
+import { NormalizedError } from "@/src/lib/client";
 
 export function useBulkImportAssets() {
   const [loading, setLoading] = useState(false);

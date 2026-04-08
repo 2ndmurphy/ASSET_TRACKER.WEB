@@ -29,9 +29,8 @@ export interface KillOperationRequest {
 
 export interface ApiResponse<T> {
   success: boolean;
-  message: string;
   data: T;
-  errorType: number;
+  message: string;
 }
 
 export interface DeviceManagementData {

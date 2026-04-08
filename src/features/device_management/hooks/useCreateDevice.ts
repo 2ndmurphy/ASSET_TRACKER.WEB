@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { createDeviceService } from "../services/deviceService";
 import { DeviceItem, CreateDeviceRequest } from "@/src/types/deviceTypes";
-import { NormalizedError } from "@/src/lib/api/client";
+import { NormalizedError } from "@/src/lib/client";
 
 export function useCreateDevice() {
   const [data, setData] = useState<DeviceItem | null>(null);

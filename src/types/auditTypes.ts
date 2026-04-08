@@ -81,18 +81,12 @@ export interface StocktakeDetailData {
 export interface AssetLifecycleData {
   assetId: number;
   items: AssetLifecycleItem[];
-  // totalCount: number;
-  // pageNumber: number;
-  // pageSize: number;
 }
 
 export interface StocktakeComparisonData {
   previousStocktakeId: number;
   currentStocktakeId: number;
   items: StocktakeComparisonItem[];
-  // totalCount: number;
-  // pageNumber: number;
-  // pageSize: number;
 }
 
 export type AuditReportSummaryResponse = ApiResponse<AuditReportSummaryData>;

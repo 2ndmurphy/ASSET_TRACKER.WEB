@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { getDeviceByIdService } from "../services/deviceService";
 import { DeviceItem } from "@/src/types/deviceTypes";
-import { NormalizedError } from "@/src/lib/api/client";
+import { NormalizedError } from "@/src/lib/client";
 
 export function useDeviceById(deviceId: number) {
   const [data, setData] = useState<DeviceItem | null>(null);

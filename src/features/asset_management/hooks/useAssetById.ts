@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { getAssetByIdService } from "../services/assetService";
 import { AssetItem } from "@/src/types/assetTypes";
-import { NormalizedError } from "@/src/lib/api/client";
+import { NormalizedError } from "@/src/lib/client";
 
 export function useAssetById(assetId: number) {
   const [data, setData] = useState<AssetItem | null>(null);
@@ -29,6 +29,6 @@ export function useAssetById(assetId: number) {
     data,
     loading,
     error,
-    refresh: fetchAssetById
+    refresh: fetchAssetById,
   };
 }

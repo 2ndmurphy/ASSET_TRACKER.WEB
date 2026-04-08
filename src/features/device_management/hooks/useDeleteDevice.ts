@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { deleteDeviceService } from "../services/deviceService";
-import { NormalizedError } from "@/src/lib/api/client";
+import { NormalizedError } from "@/src/lib/client";
 
 export function useDeleteDevice() {
   const [data, setData] = useState<void | null>(null);

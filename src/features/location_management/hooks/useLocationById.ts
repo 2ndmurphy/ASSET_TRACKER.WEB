@@ -1,14 +1,14 @@
 import { useState, useEffect, useCallback } from "react";
 import { getLocationByIdService } from "../services/locationService";
 import { LocationItem } from "@/src/types/locationTypes";
-import { NormalizedError } from "@/src/lib/api/client";
+import { NormalizedError } from "@/src/lib/client";
 
 export function useLocationById(locationId: number) {
   const [data, setData] = useState<LocationItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<NormalizedError | null>(null);
 
-  const fetchLocationById = useCallback(async() => {
+  const fetchLocationById = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -29,6 +29,6 @@ export function useLocationById(locationId: number) {
     data,
     loading,
     error,
-    refresh: fetchLocationById
+    refresh: fetchLocationById,
   };
 }

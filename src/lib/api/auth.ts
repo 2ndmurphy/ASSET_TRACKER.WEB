@@ -1,4 +1,4 @@
-import { apiClient } from "./client";
+import { apiClient } from "../client";
 import { AuthRequest, AuthResponse, MeResponse } from "@/src/types/authTypes";
 
 export const registerApi = async (
